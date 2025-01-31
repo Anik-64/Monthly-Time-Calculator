@@ -1,0 +1,35 @@
+body {
+    background-color: #f8f9fa;
+}
+
+h2 {
+    font-weight: bold;
+}
+
+.table thead th {
+    text-align: center;
+    position: sticky;
+    top: 0;
+    background: #343a40;
+    color: white;
+    z-index: 10;
+}
+
+.table tbody td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table tbody td[contenteditable="true"] {
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
+.summary {
+    background: #ffffff;
+}
+
+p {
+    margin: 0;
+    font-size: 1.1rem;
+}
