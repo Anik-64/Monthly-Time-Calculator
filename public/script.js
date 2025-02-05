@@ -77,6 +77,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     saveDataBtn.addEventListener("click", () => {
+
+        let [year, month] = monthPicker.value.split("-");
+
+        let date = new Date(year, month - 1); 
+        let formattedMonth = date.toLocaleDateString("en-US", {
+            month: "long",
+            year: "numeric",
+        });
+
         let timesheetData = [];
         document.querySelectorAll("#timeRow td").forEach(td => {
             let date = td.getAttribute("data-date");
@@ -89,9 +98,14 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("/save-timesheet", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ timesheet: timesheetData })
-        }).then(response => response.json())
-          .then(data => alert("Timesheet Saved Successfully!"))
-          .catch(error => console.error("Error saving timesheet:", error));
+            body: JSON.stringify({ 
+                timesheet: timesheetData,
+                totaltime: totalTimeEl.textContent, 
+                additionaltime: additionalTimeEl.textContent,
+                deficienttime: deficientTimeEl.textContent, 
+                month: formattedMonth
+            })
+        }).then(response => response.json()).then(data => alert("Timesheet Saved Successfully!"))
+            .catch(error => console.error("Error saving timesheet:", error));
     });
 });
