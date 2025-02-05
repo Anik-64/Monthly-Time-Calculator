@@ -19,16 +19,20 @@ const db = admin.firestore();
 // Save timesheet data
 app.post('/save-timesheet', async (req, res) => {
     try {
-        let { timesheet } = req.body;
-        let batch = db.batch();
-        let userId = 'user123';  // Modify to get dynamic user ID
+        let { timesheet, totaltime, additionaltime, deficienttime, month } = req.body;
+        let userId = 'Anik Majumder';  // Replace this with actual dynamic user ID
+        console.log(timesheet);
+        
+        let docRef = db.collection('timesheets').doc(`${userId}_${month}`);
+        await docRef.set({
+            userId,
+            month,
+            totalTime: totaltime,
+            additionalTime: additionaltime,
+            deficientTime: deficienttime,
+            entries: timesheet.filter(entry => entry.date)
+        }, { merge: true });
 
-        timesheet.forEach(({ date, time }) => {
-            let docRef = db.collection('timesheets').doc(userId).collection('months').doc(date);
-            batch.set(docRef, { time }, { merge: true });
-        });
-
-        await batch.commit();
         res.json({ message: 'Timesheet saved successfully!' });
     } catch (error) {
         res.status(500).json({ error: error.message });
