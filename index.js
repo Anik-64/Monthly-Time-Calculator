@@ -45,7 +45,7 @@ app.get('/monthly-time-calculator', isAuthenticated, (req, res) => {
 });
 
 app.get('/auth/failure', (req, res) => {
-    res.send('Something is wrong...');
+    res.sendFile(__dirname + "/public/404.html");
 });
 
 app.get('/logout', (req, res) => {
@@ -62,6 +62,7 @@ app.get('/logout', (req, res) => {
 app.get('/user/profile', (req, res) => {
     if (req.isAuthenticated()) {
         res.status(200).json({
+            id: req.user.googleId,
             name: req.user.name,
             photo: req.user.picture
         });
