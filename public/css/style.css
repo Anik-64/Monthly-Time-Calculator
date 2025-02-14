@@ -10,8 +10,8 @@ h2 {
     text-align: center;
     position: sticky;
     top: 0;
-    background: #343a40;
-    color: white;
+    background: #def0e6c4;
+    color: rgb(108, 106, 106);
     z-index: 10;
 }
 
