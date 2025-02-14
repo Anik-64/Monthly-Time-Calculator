@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userNameEl = document.getElementById("userName");
     const userPhotoEl = document.getElementById("userPhoto");
     const logoutBtn = document.getElementById("logoutBtn");
+    let userId = '';
+    let userName = '';
 
     const STANDARD_WORK_HOURS = { "Mon": 8, "Tue": 8, "Wed": 8, "Thu": 4, "Sat": 8, "Sun": 8 };
 
@@ -29,11 +31,113 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
                 // userPhotoEl.src = user.picture;
                 userPhotoEl.style.display = "block";
+                userId = user.id;
+                userName = user.name;
             }
         } catch (error) {
             console.error("User not logged in:", error);
         }
     }
+
+    async function fetchSavedTimesheets() {
+        if (!userId) return;
+
+        try {
+            let response = await fetch(`/timesheet/${userId}`);
+            let data = await response.json();
+            if (!response.ok) return;
+
+            timesheetContainer.innerHTML = "";
+            
+            Object.entries(data.timesheet).forEach(([month, details]) => {
+                let card = document.createElement("div");
+                card.className = "col-md-4 mb-3";
+                card.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">${month}</h6>
+                            <p><strong>Total Time:</strong> ${details.totalTime}</p>
+                            <p><strong>Additional Time:</strong> ${details.additionalTime}</p>
+                            <p><strong>Deficient Time:</strong> ${details.deficientTime}</p>
+                            <button class="btn btn-primary view-details" data-month="${month}">View Details</button>
+                        </div>
+                    </div>
+                    <div class="table-container d-none" id="table-${month}"></div>
+                `;
+                timesheetContainer.appendChild(card);
+            });
+
+            document.querySelectorAll(".view-details").forEach(button => {
+                button.addEventListener("click", (event) => {
+                    let month = event.target.getAttribute("data-month");
+                    toggleTableView(month, data.timesheet[month].entries);
+                });
+            });
+        } catch (error) {
+            console.error("Error fetching timesheets:", error);
+        }
+    }
+
+    function toggleTableView(month, entries) {
+        let tableContainer = document.getElementById(`table-${month}`);
+        if (!tableContainer.classList.contains("d-none")) {
+            tableContainer.classList.add("d-none");
+            tableContainer.innerHTML = "";
+            return;
+        }
+        
+        tableContainer.innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            ${entries.map(entry => `<th>${entry.date}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Time</td>
+                            ${entries.map(entry => `<td contenteditable="true" class="editable-time" data-date="${entry.date}">${entry.time}</td>`).join('')}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-success update-timesheet" data-month="${month}">Update</button>
+        `;
+        tableContainer.classList.remove("d-none");
+
+        document.querySelector(`.update-timesheet[data-month="${month}"]`).addEventListener("click", async () => {
+            await updateTimesheet(month);
+        });
+    }
+
+    async function updateTimesheet(month) {
+        let updatedEntries = [];
+        document.querySelectorAll(".editable-time").forEach(cell => {
+            updatedEntries.push({ date: cell.getAttribute("data-date"), time: cell.textContent.trim() });
+        });
+
+        try {
+            let response = await fetch("/timesheet", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, month, entries: updatedEntries })
+            });
+
+            let result = await response.json();
+            if (result.error) {
+                alert(result.message);
+            } else {
+                alert("Timesheet updated successfully");
+                fetchSavedTimesheets();
+            }
+        } catch (error) {
+            console.error("Error updating timesheet:", error);
+        }
+    }
+
+
 
     logoutBtn.addEventListener("click", async () => {
         try {
@@ -109,6 +213,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadDataBtn.addEventListener("click", () => {
         let [year, month] = monthPicker.value.split("-");
         generateTable(year, month);
+        fetchSavedTimesheets();
     });
 
     saveDataBtn.addEventListener("click", () => {
@@ -125,10 +230,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        fetch("/save-timesheet", {
+        fetch("/timesheet", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
+                id: userId,
+                name: userName,
                 timesheet: timesheetData,
                 totaltime: totalTimeEl.textContent, 
                 additionaltime: additionalTimeEl.textContent,
@@ -139,5 +246,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             .catch(error => console.error("Error saving timesheet:", error));
     });
 
-    fetchUserProfile();
+    await fetchUserProfile();
+    await fetchSavedTimesheets();
+    // fetchUserProfile().then(() => {
+    //     if (monthPicker.value) fetchSavedTimesheets();
+    // });
 });
