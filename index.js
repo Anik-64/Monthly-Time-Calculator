@@ -71,7 +71,7 @@ app.get('/user/profile', (req, res) => {
     }
 });
 
-app.use("/save-timesheet", isAuthenticated, timeSaveRouter);
+app.use("/api/v1/timesheet", isAuthenticated, timeSaveRouter);
 
 // Start the server
 app.listen(process.env.PORT, () => {
