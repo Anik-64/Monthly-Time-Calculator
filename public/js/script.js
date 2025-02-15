@@ -15,9 +15,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const STANDARD_WORK_HOURS = { "Mon": 8, "Tue": 8, "Wed": 8, "Thu": 4, "Sat": 8, "Sun": 8 };
 
+    // Fetch user profile
     async function fetchUserProfile() {
         try {
-            let response = await fetch('/user/profile');
+            let response = await fetch('/api/v1/user/');
             let user = await response.json();
 
             console.log(user);
@@ -39,11 +40,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Saved timestamps
     async function fetchSavedTimesheets() {
         if (!userId) return;
 
         try {
-            let response = await fetch(`/timesheet/${userId}`);
+            let response = await fetch(`/api/v1/timesheet/${userId}`);
             let data = await response.json();
             if (!response.ok) return;
 
@@ -54,11 +56,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 card.className = "col-md-4 mb-3";
                 card.innerHTML = `
                     <div class="card">
+                        <h5 class="card-header">${month}</h5>
                         <div class="card-body">
-                            <h6 class="card-title">${month}</h6>
-                            <p><strong>Total Time:</strong> ${details.totalTime}</p>
-                            <p><strong>Additional Time:</strong> ${details.additionalTime}</p>
-                            <p><strong>Deficient Time:</strong> ${details.deficientTime}</p>
+                            <p>Total: <strong>${details.totalTime}</strong></p>
+                            <p class="text-success">Additional: <strong>${details.additionalTime}</strong></p>
+                            <p class="text-danger">Deficient: <strong>${details.deficientTime}</strong></p>
                             <button class="btn btn-primary view-details" data-month="${month}">View Details</button>
                         </div>
                     </div>
@@ -112,33 +114,74 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
+    // Update timestamps
+    // async function updateTimesheet(month) {
+    //     let updatedEntries = [];
+    //     document.querySelectorAll(".editable-time").forEach(cell => {
+    //         updatedEntries.push({ date: cell.getAttribute("data-date"), time: cell.textContent.trim() });
+    //     });
+
+    //     try {
+    //         let response = await fetch("/api/v1/timesheet", {
+    //             method: "PUT",
+    //             headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify({ userId, month, entries: updatedEntries })
+    //         });
+
+    //         let result = await response.json();
+    //         if (result.error) {
+    //             alert(result.message);
+    //         } else {
+    //             alert("Timesheet updated successfully");
+    //             fetchSavedTimesheets();
+    //         }
+    //     } catch (error) {
+    //         console.error("Error updating timesheet:", error);
+    //     }
+    // }
+
     async function updateTimesheet(month) {
         let updatedEntries = [];
         document.querySelectorAll(".editable-time").forEach(cell => {
             updatedEntries.push({ date: cell.getAttribute("data-date"), time: cell.textContent.trim() });
         });
 
-        try {
-            let response = await fetch("/timesheet", {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId, month, entries: updatedEntries })
-            });
+        Swal.fire({
+            title: "Do you want to save the changes?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, do it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    let response = await fetch("/api/v1/timesheet", {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ userId, month, entries: updatedEntries })
+                    });
 
-            let result = await response.json();
-            if (result.error) {
-                alert(result.message);
-            } else {
-                alert("Timesheet updated successfully");
-                fetchSavedTimesheets();
+                    let result = await response.json();
+                    if (result.error) {
+                        Swal.fire("Error", result.message, "error");
+                    } else {
+                        Swal.fire("Saved!", "Timesheet updated successfully.", "success")
+                        .then(() => {
+                            fetchSavedTimesheets(); // Refresh the saved timesheets
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire("Error", "Failed to update timesheet. Please try again.", "error");
+                    console.error("Error updating timesheet:", error);
+                }
+            } else if (result.isDenied) {
+                Swal.fire("Changes are not saved", "", "info");
             }
-        } catch (error) {
-            console.error("Error updating timesheet:", error);
-        }
+        });
     }
 
-
-
+    // Logout action
     logoutBtn.addEventListener("click", async () => {
         try {
             await fetch('/logout', { method: 'GET' });
@@ -213,42 +256,98 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadDataBtn.addEventListener("click", () => {
         let [year, month] = monthPicker.value.split("-");
         generateTable(year, month);
-        fetchSavedTimesheets();
+        // fetchSavedTimesheets();
     });
+
+    // Save the time stamps
+    // saveDataBtn.addEventListener("click", () => {
+    //     let [year, month] = monthPicker.value.split("-");
+    //     let date = new Date(year, month - 1);
+    //     let formattedMonth = date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+    //     let timesheetData = [];
+    //     document.querySelectorAll("#timeRow td").forEach(td => {
+    //         let date = td.getAttribute("data-date");
+    //         let time = td.textContent.trim();
+    //         if (time) {
+    //             timesheetData.push({ date, time });
+    //         }
+    //     });
+
+    //     fetch("/timesheet", {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify({ 
+    //             id: userId,
+    //             name: userName,
+    //             timesheet: timesheetData,
+    //             totaltime: totalTimeEl.textContent, 
+    //             additionaltime: additionalTimeEl.textContent,
+    //             deficienttime: deficientTimeEl.textContent, 
+    //             month: formattedMonth
+    //         })
+    //     }).then(response => response.json())
+    //         .then(data => {
+    //             alert("Timesheet Saved Successfully!");
+    //             return fetchSavedTimesheets();
+    //         })
+    //         .catch(error => console.error("Error saving timesheet:", error));
+    // });
+
 
     saveDataBtn.addEventListener("click", () => {
-        let [year, month] = monthPicker.value.split("-");
-        let date = new Date(year, month - 1);
-        let formattedMonth = date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+        Swal.fire({
+            title: "Do you want to save this timesheets?",
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: "Save",
+            denyButtonText: `Don't save`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let [year, month] = monthPicker.value.split("-");
+                let date = new Date(year, month - 1);
+                let formattedMonth = date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
-        let timesheetData = [];
-        document.querySelectorAll("#timeRow td").forEach(td => {
-            let date = td.getAttribute("data-date");
-            let time = td.textContent.trim();
-            if (time) {
-                timesheetData.push({ date, time });
+                let timesheetData = [];
+                document.querySelectorAll("#timeRow td").forEach(td => {
+                    let date = td.getAttribute("data-date");
+                    let time = td.textContent.trim();
+                    if (time) {
+                        timesheetData.push({ date, time });
+                    }
+                });
+
+                fetch("/api/v1/timesheet", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        id: userId,
+                        name: userName,
+                        timesheet: timesheetData,
+                        totaltime: totalTimeEl.textContent, 
+                        additionaltime: additionalTimeEl.textContent,
+                        deficienttime: deficientTimeEl.textContent, 
+                        month: formattedMonth
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire("Saved!", "Timesheet has been saved successfully.", "success")
+                    .then(() => {
+                        fetchSavedTimesheets(); // Fetch updated user profile after saving
+                    });
+                })
+                .catch(error => {
+                    Swal.fire("Error", "Failed to save timesheet. Please try again.", "error");
+                    console.error("Error saving timesheet:", error);
+                });
+            } else if (result.isDenied) {
+                Swal.fire("Changes are not saved", "", "info");
             }
         });
-
-        fetch("/timesheet", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                id: userId,
-                name: userName,
-                timesheet: timesheetData,
-                totaltime: totalTimeEl.textContent, 
-                additionaltime: additionalTimeEl.textContent,
-                deficienttime: deficientTimeEl.textContent, 
-                month: formattedMonth
-            })
-        }).then(response => response.json()).then(data => alert("Timesheet Saved Successfully!"))
-            .catch(error => console.error("Error saving timesheet:", error));
     });
+
 
     await fetchUserProfile();
     await fetchSavedTimesheets();
-    // fetchUserProfile().then(() => {
-    //     if (monthPicker.value) fetchSavedTimesheets();
-    // });
 });
