@@ -59,7 +59,7 @@ app.get('/logout', (req, res) => {
     });
 });
 
-app.get('/user/profile', (req, res) => {
+app.get('/api/v1/user', (req, res) => {
     if (req.isAuthenticated()) {
         res.status(200).json({
             id: req.user.googleId,
