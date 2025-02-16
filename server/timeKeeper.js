@@ -9,8 +9,6 @@ const db = admin.firestore();
 timeKeeperRouter.post('/', async (req, res) => {
     try {
         let { id, name, timesheet, totaltime, additionaltime, deficienttime, month } = req.body;
-
-        // console.log("Saving timesheet for:", id, name);
         
         let userDocRef = db.collection('timesheets').doc(id);
         let monthDocRef = userDocRef.collection('months').doc(month); 
@@ -30,6 +28,7 @@ timeKeeperRouter.post('/', async (req, res) => {
     }
 });
 
+// Get specific user data
 timeKeeperRouter.get('/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
@@ -54,12 +53,11 @@ timeKeeperRouter.get('/:userId', async (req, res) => {
     }
 });
 
+// Updated route 
 timeKeeperRouter.put('/', async (req, res) => {
-
-    // Function to extract hours and minutes correctly
     function extractTime(timeStr) {
         if (!timeStr) return { hours: 0, minutes: 0 };
-        
+
         let hours = 0, minutes = 0;
         let hourMatch = timeStr.match(/(\d+)h/);
         let minuteMatch = timeStr.match(/(\d+)m/);
@@ -70,49 +68,56 @@ timeKeeperRouter.put('/', async (req, res) => {
         return { hours, minutes };
     }
 
+    const STANDARD_WORK_HOURS = { "Mon": 8, "Tue": 8, "Wed": 8, "Thu": 4, "Sat": 8, "Sun": 8 };
+
     try {
         let { userId, month, entries } = req.body;
-        
+
         let userDocRef = db.collection("timesheets").doc(userId);
         let monthsCollectionRef = userDocRef.collection("months").doc(month);
-        
-        console.log(userDocRef.get());
+
         let userDoc = await userDocRef.get();
         let monthDoc = await monthsCollectionRef.get();
 
         if (!userDoc) {
             return res.status(404).json({ 
-                error: true,
+                error: true, 
                 message: "Timesheet not found" 
             });
         }
 
         if (!monthDoc) {
             return res.status(404).json({ 
-                error: true,
+                error: true, 
                 message: `No timesheet found for ${month}` 
             });
         }
 
         let timesheetData = monthDoc.data();
 
-        // Update entries with new times
+        // Update entries
         let updatedEntries = timesheetData.entries.map(entry => {
             let updatedEntry = entries.find(e => e.date === entry.date);
             return updatedEntry ? { ...entry, time: updatedEntry.time } : entry;
         });
 
-        // Recalculate total, additional, and deficient time
+        // Calculate total time
         let totalMinutes = updatedEntries.reduce((sum, entry) => {
             let { hours, minutes } = extractTime(entry.time);
             return sum + hours * 60 + minutes;
         }, 0);
 
-        let requiredMinutes = updatedEntries.length * 8 * 60; // Assuming 8-hour workdays
+        // Calculate expected (standard) work hours
+        let requiredMinutes = updatedEntries.reduce((sum, entry) => {
+            let dayName = new Date(entry.date).toLocaleDateString("en-US", { weekday: "short" });
+            return sum + (STANDARD_WORK_HOURS[dayName] || 0) * 60;
+        }, 0);
+
+        // Calculate additional and deficient time
         let additionalMinutes = Math.max(0, totalMinutes - requiredMinutes);
         let deficientMinutes = Math.max(0, requiredMinutes - totalMinutes);
 
-        // Convert back to "Xh Ym" format
+        // Convert to readable format
         let formatTime = (minutes) => `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
 
         let totalTime = formatTime(totalMinutes);
