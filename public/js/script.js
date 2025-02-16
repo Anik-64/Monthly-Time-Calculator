@@ -115,31 +115,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Update timestamps
-    // async function updateTimesheet(month) {
-    //     let updatedEntries = [];
-    //     document.querySelectorAll(".editable-time").forEach(cell => {
-    //         updatedEntries.push({ date: cell.getAttribute("data-date"), time: cell.textContent.trim() });
-    //     });
-
-    //     try {
-    //         let response = await fetch("/api/v1/timesheet", {
-    //             method: "PUT",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify({ userId, month, entries: updatedEntries })
-    //         });
-
-    //         let result = await response.json();
-    //         if (result.error) {
-    //             alert(result.message);
-    //         } else {
-    //             alert("Timesheet updated successfully");
-    //             fetchSavedTimesheets();
-    //         }
-    //     } catch (error) {
-    //         console.error("Error updating timesheet:", error);
-    //     }
-    // }
-
     async function updateTimesheet(month) {
         let updatedEntries = [];
         document.querySelectorAll(".editable-time").forEach(cell => {
@@ -256,45 +231,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadDataBtn.addEventListener("click", () => {
         let [year, month] = monthPicker.value.split("-");
         generateTable(year, month);
-        // fetchSavedTimesheets();
     });
 
     // Save the time stamps
-    // saveDataBtn.addEventListener("click", () => {
-    //     let [year, month] = monthPicker.value.split("-");
-    //     let date = new Date(year, month - 1);
-    //     let formattedMonth = date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-
-    //     let timesheetData = [];
-    //     document.querySelectorAll("#timeRow td").forEach(td => {
-    //         let date = td.getAttribute("data-date");
-    //         let time = td.textContent.trim();
-    //         if (time) {
-    //             timesheetData.push({ date, time });
-    //         }
-    //     });
-
-    //     fetch("/timesheet", {
-    //         method: "POST",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify({ 
-    //             id: userId,
-    //             name: userName,
-    //             timesheet: timesheetData,
-    //             totaltime: totalTimeEl.textContent, 
-    //             additionaltime: additionalTimeEl.textContent,
-    //             deficienttime: deficientTimeEl.textContent, 
-    //             month: formattedMonth
-    //         })
-    //     }).then(response => response.json())
-    //         .then(data => {
-    //             alert("Timesheet Saved Successfully!");
-    //             return fetchSavedTimesheets();
-    //         })
-    //         .catch(error => console.error("Error saving timesheet:", error));
-    // });
-
-
     saveDataBtn.addEventListener("click", () => {
         Swal.fire({
             title: "Do you want to save this timesheets?",
@@ -334,6 +273,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 .then(data => {
                     Swal.fire("Saved!", "Timesheet has been saved successfully.", "success")
                     .then(() => {
+                        resetForm();
                         fetchSavedTimesheets(); // Fetch updated user profile after saving
                     });
                 })
@@ -346,6 +286,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
     });
+
+    // Reset function to clear form
+    function resetForm() {
+        // Clear all time entries
+        document.querySelectorAll("#timeRow td").forEach(td => {
+            td.textContent = "";
+        });
+
+        // Reset summary fields
+        totalTimeEl.textContent = "0h 0m";
+        additionalTimeEl.textContent = "0h 0m";
+        deficientTimeEl.textContent = "0h 0m";
+
+        // Reset month picker
+        monthPicker.value = "";
+
+        // Remove generated table content
+        document.getElementById("dateRow").innerHTML = "<th>Date</th>";
+        document.getElementById("timeRow").innerHTML = "<td>Time</td>";
+
+        // Optionally hide or reset styles if needed
+        document.getElementById("timesheetContainer").innerHTML = "";
+    }
 
 
     await fetchUserProfile();
