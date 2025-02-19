@@ -41,45 +41,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Saved timestamps
-    // async function fetchSavedTimesheets() {
-    //     if (!userId) return;
-
-    //     try {
-    //         let response = await fetch(`/api/v1/timesheet/${userId}`);
-    //         let data = await response.json();
-    //         if (!response.ok) return;
-
-    //         timesheetContainer.innerHTML = "";
-            
-    //         Object.entries(data.timesheet).forEach(([month, details]) => {
-    //             let card = document.createElement("div");
-    //             card.className = "col-md-4 mb-3";
-    //             card.innerHTML = `
-    //                 <div class="card">
-    //                     <h5 class="card-header">${month}</h5>
-    //                     <div class="card-body">
-    //                         <p>Total: <strong>${details.totalTime}</strong></p>
-    //                         <p class="text-success">Additional: <strong>${details.additionalTime}</strong></p>
-    //                         <p class="text-danger">Deficient: <strong>${details.deficientTime}</strong></p>
-    //                         <button class="btn btn-primary view-details" data-month="${month}">View Details</button>
-    //                     </div>
-    //                 </div>
-    //                 <div class="table-container d-none" id="table-${month}"></div>
-    //             `;
-    //             timesheetContainer.appendChild(card);
-    //         });
-
-    //         document.querySelectorAll(".view-details").forEach(button => {
-    //             button.addEventListener("click", (event) => {
-    //                 let month = event.target.getAttribute("data-month");
-    //                 toggleTableView(month, data.timesheet[month].entries);
-    //             });
-    //         });
-    //     } catch (error) {
-    //         console.error("Error fetching timesheets:", error);
-    //     }
-    // }
-
     async function fetchSavedTimesheets() {
         if (!userId) return;
 
@@ -202,16 +163,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // Logout action
-    logoutBtn.addEventListener("click", async () => {
-        try {
-            await fetch('/logout', { method: 'GET' });
-            window.location.href = "/"; // Redirect to login page
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
-    });
-
     function parseTime(timeStr) {
         let match = timeStr.match(/(\d+)h\s*(\d*)m?/);
         if (match) {
@@ -294,12 +245,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 let formattedMonth = date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
                 let timesheetData = [];
+
                 document.querySelectorAll("#timeRow td").forEach(td => {
                     let date = td.getAttribute("data-date");
                     let time = td.textContent.trim();
-                    if (time) {
-                        timesheetData.push({ date, time });
+                    if (!time) { 
+                        time = "0h0m";
                     }
+                    timesheetData.push({ date, time });
                 });
 
                 fetch("/api/v1/timesheet", {
@@ -320,7 +273,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     Swal.fire("Saved!", "Timesheet has been saved successfully.", "success")
                     .then(() => {
                         resetForm();
-                        fetchSavedTimesheets(); // Fetch updated user profile after saving
+                        fetchSavedTimesheets();
                     });
                 })
                 .catch(error => {
@@ -335,27 +288,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Reset function to clear form
     function resetForm() {
-        // Clear all time entries
         document.querySelectorAll("#timeRow td").forEach(td => {
             td.textContent = "";
         });
 
-        // Reset summary fields
         totalTimeEl.textContent = "0h 0m";
         additionalTimeEl.textContent = "0h 0m";
         deficientTimeEl.textContent = "0h 0m";
 
-        // Reset month picker
         monthPicker.value = "";
 
-        // Remove generated table content
         document.getElementById("dateRow").innerHTML = "<th>Date</th>";
         document.getElementById("timeRow").innerHTML = "<td>Time</td>";
 
-        // Optionally hide or reset styles if needed
         document.getElementById("timesheetContainer").innerHTML = "";
     }
 
+    // Logout action
+    logoutBtn.addEventListener("click", async () => {
+        try {
+            await fetch('/logout', { method: 'GET' });
+            window.location.href = "/"; // Redirect to login page
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    });
 
     await fetchUserProfile();
     await fetchSavedTimesheets();
