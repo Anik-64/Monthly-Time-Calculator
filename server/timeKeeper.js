@@ -29,6 +29,34 @@ timeKeeperRouter.post('/', async (req, res) => {
 });
 
 // Get specific user data
+// timeKeeperRouter.get('/:userId', async (req, res) => {
+//     try {
+//         const { userId } = req.params;
+//         let userDocRef = db.collection('timesheets').doc(userId);
+//         let monthsCollectionRef = userDocRef.collection('months');
+
+//         // Fetch all months data
+//         let monthsSnapshot = await monthsCollectionRef.orderBy('month', 'desc').get();
+//         if (monthsSnapshot.empty) {
+//             return res.status(404).json({ 
+//                 error: true,
+//                 message: 'No timesheet data found for this user' 
+//             });
+//         }
+
+//         let timesheetData = {};
+//         monthsSnapshot.forEach(doc => {
+//             timesheetData[doc.id] = doc.data();
+//         });
+
+//         return res.json({ userId, timesheet: timesheetData });
+//     } catch (error) {
+//         console.error("Error fetching timesheet:", error);
+//         return res.status(500).json({ message: "Internal Server Error", error });
+//     }
+// });
+
+// Sort the time in reverse manner
 timeKeeperRouter.get('/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
@@ -41,17 +69,48 @@ timeKeeperRouter.get('/:userId', async (req, res) => {
             return res.status(404).json({ message: 'No timesheet data found for this user' });
         }
 
-        let timesheetData = {};
+        let timesheetData = [];
+
         monthsSnapshot.forEach(doc => {
-            timesheetData[doc.id] = doc.data();
+            timesheetData.push({ id: doc.id, data: doc.data() });
         });
 
-        return res.json({ userId, timesheet: timesheetData });
+        // Helper function to convert month names to numbers
+        const monthNameToNumber = (monthName) => {
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June', 
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            return months.indexOf(monthName) + 1;
+        };
+
+        // Sort by year (desc), then by month (desc)
+        timesheetData.sort((a, b) => {
+            let [monthA, yearA] = a.id.split(' ');
+            let [monthB, yearB] = b.id.split(' ');
+
+            yearA = parseInt(yearA);
+            yearB = parseInt(yearB);
+
+            let monthNumA = monthNameToNumber(monthA);
+            let monthNumB = monthNameToNumber(monthB);
+
+            return yearB - yearA || monthNumB - monthNumA;
+        });
+
+        // Convert back to object format
+        let sortedTimesheetData = {};
+        timesheetData.forEach(entry => {
+            sortedTimesheetData[entry.id] = entry.data;
+        });
+
+        return res.json({ userId, timesheet: sortedTimesheetData });
     } catch (error) {
         console.error("Error fetching timesheet:", error);
         return res.status(500).json({ message: "Internal Server Error", error });
     }
 });
+
 
 // Updated route 
 timeKeeperRouter.put('/', async (req, res) => {
