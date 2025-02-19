@@ -41,6 +41,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Saved timestamps
+    // async function fetchSavedTimesheets() {
+    //     if (!userId) return;
+
+    //     try {
+    //         let response = await fetch(`/api/v1/timesheet/${userId}`);
+    //         let data = await response.json();
+    //         if (!response.ok) return;
+
+    //         timesheetContainer.innerHTML = "";
+            
+    //         Object.entries(data.timesheet).forEach(([month, details]) => {
+    //             let card = document.createElement("div");
+    //             card.className = "col-md-4 mb-3";
+    //             card.innerHTML = `
+    //                 <div class="card">
+    //                     <h5 class="card-header">${month}</h5>
+    //                     <div class="card-body">
+    //                         <p>Total: <strong>${details.totalTime}</strong></p>
+    //                         <p class="text-success">Additional: <strong>${details.additionalTime}</strong></p>
+    //                         <p class="text-danger">Deficient: <strong>${details.deficientTime}</strong></p>
+    //                         <button class="btn btn-primary view-details" data-month="${month}">View Details</button>
+    //                     </div>
+    //                 </div>
+    //                 <div class="table-container d-none" id="table-${month}"></div>
+    //             `;
+    //             timesheetContainer.appendChild(card);
+    //         });
+
+    //         document.querySelectorAll(".view-details").forEach(button => {
+    //             button.addEventListener("click", (event) => {
+    //                 let month = event.target.getAttribute("data-month");
+    //                 toggleTableView(month, data.timesheet[month].entries);
+    //             });
+    //         });
+    //     } catch (error) {
+    //         console.error("Error fetching timesheets:", error);
+    //     }
+    // }
+
     async function fetchSavedTimesheets() {
         if (!userId) return;
 
@@ -49,18 +88,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             let data = await response.json();
             if (!response.ok) return;
 
+            // console.log("API Response:", data); // Debugging
+
+            let timesheetArray = Array.isArray(data.timesheet) ? data.timesheet : Object.entries(data.timesheet).map(([month, details]) => ({
+                month,
+                data: details
+            }));
+
             timesheetContainer.innerHTML = "";
-            
-            Object.entries(data.timesheet).forEach(([month, details]) => {
+
+            timesheetArray.forEach(({ month, data }) => {  
                 let card = document.createElement("div");
                 card.className = "col-md-4 mb-3";
                 card.innerHTML = `
                     <div class="card">
                         <h5 class="card-header">${month}</h5>
                         <div class="card-body">
-                            <p>Total: <strong>${details.totalTime}</strong></p>
-                            <p class="text-success">Additional: <strong>${details.additionalTime}</strong></p>
-                            <p class="text-danger">Deficient: <strong>${details.deficientTime}</strong></p>
+                            <p>Total: <strong>${data.totalTime}</strong></p>
+                            <p class="text-success">Additional: <strong>${data.additionalTime}</strong></p>
+                            <p class="text-danger">Deficient: <strong>${data.deficientTime}</strong></p>
                             <button class="btn btn-primary view-details" data-month="${month}">View Details</button>
                         </div>
                     </div>
@@ -72,7 +118,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.querySelectorAll(".view-details").forEach(button => {
                 button.addEventListener("click", (event) => {
                     let month = event.target.getAttribute("data-month");
-                    toggleTableView(month, data.timesheet[month].entries);
+                    toggleTableView(month, timesheetArray.find(item => item.month === month).data.entries);
                 });
             });
         } catch (error) {
