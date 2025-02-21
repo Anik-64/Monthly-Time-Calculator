@@ -215,6 +215,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             let th = document.createElement("th");
             th.textContent = `${day} (${dayName})`;
+
+            if (dayName === "Fri") {
+                th.classList.add("text-danger"); 
+            }
+
             dateRow.appendChild(th);
 
             let td = document.createElement("td");
@@ -226,6 +231,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     loadDataBtn.addEventListener("click", () => {
+        const selectedMonth = monthPicker.value;
+        if (!selectedMonth) {
+            Swal.fire("Error", "Please select a month", "error");
+            return;
+        }
         let [year, month] = monthPicker.value.split("-");
         generateTable(year, month);
     });
