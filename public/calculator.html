@@ -12,7 +12,7 @@
 
 <div class="container my-4">
     <header class="d-flex justify-content-between align-items-center bg-light border mb-3 shadow p-2 bg-body rounded">
-        <h4>Monthly Work Time Calculator</h4>
+        <h4>🕒 Monthly Work Time Calculator</h4>
         <div id="userProfile" class="d-flex align-items-center">
             <img id="userPhoto" src="" alt="User" class="rounded-circle me-2" width="40" height="40" style="display: none;">
             <span id="userName" class="me-3"></span>
@@ -23,7 +23,7 @@
     <div class="border shadow p-2 bg-body rounded">
         <div class="d-flex mb-3">
             <input type="month" id="monthPicker" class="form-control w-25"> &nbsp;&nbsp;
-            <button id="loadData" class="btn btn-primary">Load Month</button>
+            <button id="loadData" class="btn btn-primary">📅 Load Month</button>
         </div>
     
         <div class="table-responsive">
@@ -42,7 +42,7 @@
         </div>
     
         <div class="summary mt-4 mb-4 p-3 border rounded">
-            <h5>Summary</h5>
+            <h5>📊 Summary</h5>
             <p><strong>Total Time:</strong> <span id="totalTime">0h 0m</span></p>
             <p class="text-success"><strong>Additional Time:</strong> <span id="additionalTime">0h 0m</span></p>
             <p class="text-danger"><strong>Deficient Time:</strong> <span id="deficientTime">0h 0m</span></p>
@@ -51,8 +51,8 @@
         <button id="saveData" class="btn btn-success">Save Timesheet</button>
     </div>
 
-    <div id="savedTimesheets" class="mt-4">
-        <h5>Saved Timesheets</h5>
+    <div id="savedTimesheets" class="mt-4 border shadow rounded p-2">
+        <h5>📁 Saved Timesheets</h5>
         <div id="timesheetContainer" class="row">
             <!-- Timesheet cards will be dynamically added here -->
         </div>
