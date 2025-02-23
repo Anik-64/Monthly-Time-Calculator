@@ -318,7 +318,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     logoutBtn.addEventListener("click", async () => {
         try {
             await fetch('/logout', { method: 'GET' });
-            window.location.href = "/login"; // Redirect to login page
+            window.location.href = "/"; // Redirect to login page
         } catch (error) {
             console.error("Logout error:", error);
         }

@@ -25,7 +25,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routers
-app.get('/', (req, res) => {
+app.get('/healthcheck', (req, res) => {
     try {
         res.status(200).end();
     } catch (err) {
@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
     }
 });
 
-app.get('/login', (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(__dirname + "/public/login.html");
 });
 
@@ -62,7 +62,7 @@ app.get('/logout', (req, res) => {
             return next(err);
         }
         req.session.destroy(() => {
-            res.redirect('/login'); 
+            res.redirect('/'); 
         });
     });
 });
