@@ -230,14 +230,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    loadDataBtn.addEventListener("click", () => {
+    // Load data 
+    loadDataBtn.addEventListener("click", async () => {
         const selectedMonth = monthPicker.value;
         if (!selectedMonth) {
             Swal.fire("Error", "Please select a month", "error");
             return;
         }
-        let [year, month] = monthPicker.value.split("-");
+
+        let [year, month] = selectedMonth.split("-");
+        let formattedMonth = new Date(year, month - 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+        let response = await fetch(`/api/v1/timesheet/${userId}/${formattedMonth}`);
+        let data = await response.json();
+
+        if (data.error) {
+            // No data found for the selected month, generate a new table
+            generateTable(year, month);
+            totalTimeEl.textContent = "";
+            additionalTimeEl.textContent = "";
+            deficientTimeEl.textContent = "";
+            return;
+        }
+
+        // Data found, populate the table
         generateTable(year, month);
+
+        // Populate the table with the fetched data
+        data.timesheet.entries.forEach(entry => {
+            let td = document.querySelector(`#timeRow td[data-date="${entry.date}"]`);
+            if (td) {
+                td.textContent = entry.time;
+            }
+        });
+
+        // Update the total, additional, and deficient time fields
+        totalTimeEl.textContent = data.timesheet.totalTime;
+        additionalTimeEl.textContent = data.timesheet.additionalTime;
+        deficientTimeEl.textContent = data.timesheet.deficientTime;
     });
 
     // Save the time stamps
