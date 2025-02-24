@@ -5,6 +5,36 @@ const timeKeeperRouter = express.Router();
 
 const db = admin.firestore();
 
+// Get specific user specific month data
+timeKeeperRouter.get('/:userId/:month', async (req, res) => {
+    try {
+        const { userId, month } = req.params;
+        let userDocRef = db.collection('timesheets').doc(userId);
+        let monthDocRef = userDocRef.collection('months').doc(month);
+
+        let monthDoc = await monthDocRef.get();
+
+        if (!monthDoc) {
+            return res.status(404).json({ 
+                error: true,
+                message: 'No timesheet data found for this month' 
+            });
+        }
+
+        let timesheetData = monthDoc.data();
+
+        res.status(200).json({
+            error: false,
+            timesheet: timesheetData,
+        });
+
+        // res.json({ userId, month, timesheet: timesheetData });
+    } catch (error) {
+        console.error("Error fetching timesheet:", error);
+        return res.status(500).json({ message: "Internal Server Error", error });
+    }
+});
+
 // Save timesheet data
 timeKeeperRouter.post('/', async (req, res) => {
     try {
@@ -29,33 +59,6 @@ timeKeeperRouter.post('/', async (req, res) => {
 });
 
 // Get specific user data
-// timeKeeperRouter.get('/:userId', async (req, res) => {
-//     try {
-//         const { userId } = req.params;
-//         let userDocRef = db.collection('timesheets').doc(userId);
-//         let monthsCollectionRef = userDocRef.collection('months');
-
-//         // Fetch all months data
-//         let monthsSnapshot = await monthsCollectionRef.orderBy('month', 'desc').get();
-//         if (monthsSnapshot.empty) {
-//             return res.status(404).json({ 
-//                 error: true,
-//                 message: 'No timesheet data found for this user' 
-//             });
-//         }
-
-//         let timesheetData = {};
-//         monthsSnapshot.forEach(doc => {
-//             timesheetData[doc.id] = doc.data();
-//         });
-
-//         return res.json({ userId, timesheet: timesheetData });
-//     } catch (error) {
-//         console.error("Error fetching timesheet:", error);
-//         return res.status(500).json({ message: "Internal Server Error", error });
-//     }
-// });
-
 // Sort the time in reverse manner
 timeKeeperRouter.get('/:userId', async (req, res) => {
     try {
