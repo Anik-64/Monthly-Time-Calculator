@@ -140,14 +140,14 @@ timeKeeperRouter.put('/', async (req, res) => {
         let userDoc = await userDocRef.get();
         let monthDoc = await monthsCollectionRef.get();
 
-        if (!userDoc.data()) {
+        if (!userDoc) {
             return res.status(404).json({ 
                 error: true, 
                 message: "User not found" 
             });
         }
 
-        if (!monthDoc.data()) {
+        if (!monthDoc) {
             return res.status(404).json({ 
                 error: true, 
                 message: `No timesheet found for ${month}` 
