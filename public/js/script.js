@@ -15,20 +15,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const STANDARD_WORK_HOURS = { "Mon": 8, "Tue": 8, "Wed": 8, "Thu": 4, "Sat": 8, "Sun": 8 };
 
-    // Fetch user profile
+    // Fetch user profile 
     async function fetchUserProfile() {
         try {
             let response = await fetch('/api/v1/user/');
             let user = await response.json();
-
             if (response.status == 200) {
                 userNameEl.textContent = user.name;
-                if (user.photo) {
-                    userPhotoEl.src = user.photo;
-                } else {
-                    userPhotoEl.src = "../logo/image.png"; // Set a default image
-                }
-                // userPhotoEl.src = user.picture;
+                userPhotoEl.src = user.photo || "../logo/image.png";
                 userPhotoEl.style.display = "block";
                 userId = user.id;
                 userName = user.name;
@@ -38,16 +32,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Saved timestamps
+    // Fetch saved timesheets 
     async function fetchSavedTimesheets() {
         if (!userId) return;
-
         try {
             let response = await fetch(`/api/v1/timesheet/${userId}`);
             let data = await response.json();
             if (!response.ok) return;
-
-            // console.log("API Response:", data); // Debugging
 
             let timesheetArray = Array.isArray(data.timesheet) ? data.timesheet : Object.entries(data.timesheet).map(([month, details]) => ({
                 month,
@@ -55,7 +46,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }));
 
             timesheetContainer.innerHTML = "";
-
             timesheetArray.forEach(({ month, data }) => {  
                 let card = document.createElement("div");
                 card.className = "col-md-4 mb-3";
@@ -85,6 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Toggle table view 
     function toggleTableView(month, entries) {
         let tableContainer = document.getElementById(`table-${month}`);
         if (!tableContainer.classList.contains("d-none")) {
@@ -119,15 +110,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // Update timestamps
+    // Update timesheet 
     async function updateTimesheet(month) {
         let updatedEntries = [];
-        // document.querySelectorAll(".editable-time").forEach(cell => {
-        //     updatedEntries.push({ date: cell.getAttribute("data-date"), time: cell.textContent.trim() });
-        // });
-        let hasNegativeValue = false; // Flag to check for negative values
+        let hasInvalidValue = false; // Flag to check for negative values
 
-        // Collect updated entries and validate for negative values
+        let errorMessage = ""; 
+        let invalidCell = null; 
+
+        // Collect updated entries and validate for invalid values
         document.querySelectorAll(".editable-time").forEach(cell => {
             let date = cell.getAttribute("data-date");
             let time = cell.textContent.trim();
@@ -135,29 +126,69 @@ document.addEventListener("DOMContentLoaded", async () => {
                 time = "0h0m";
             }
 
-            // Check for negative values in the time input
-            let timePattern = /^(-?\d+h)?\s*(-?\d+m)?$/;
-            if (timePattern.test(time)) {
-                let hoursMatch = time.match(/(-?\d+)h/);
-                let minutesMatch = time.match(/(-?\d+)m/);
+            // Check for valid time format (e.g., 8h30m, 0h0m, etc.)
+            let timePattern = /^(\d+h)?\s*(\d+m)?$/;
+            if (!timePattern.test(time)) {
+                hasInvalidValue = true;
+                errorMessage = "Invalid time format. Use 'XhYm' (e.g., 8h30m).";
+                invalidCell = cell; // Store the invalid cell
+                return;
+            }
 
-                let hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
-                let minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+            // Extract hours and minutes
+            let hoursMatch = time.match(/(\d+)h/);
+            let minutesMatch = time.match(/(\d+)m/);
 
-                if (hours < 0 || minutes < 0) {
-                    hasNegativeValue = true; // Set flag if negative value is found
-                }
+            let hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
+            let minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+
+            // Check for negative values
+            if (hours < 0 || minutes < 0) {
+                hasInvalidValue = true;
+                errorMessage = "Negative values are not allowed.";
+                invalidCell = cell; // Store the invalid cell
+                return;
+            }
+
+            // Check if minutes are greater than 59
+            if (minutes > 59) {
+                hasInvalidValue = true;
+                errorMessage = "Minutes cannot be greater than 59.";
+                invalidCell = cell; // Store the invalid cell
+                return;
+            }
+
+            // Check for invalid formats like 8.5h60m or 8.5h60.5m
+            if (time.includes(".")) {
+                hasInvalidValue = true;
+                errorMessage = "Decimal values are not allowed.";
+                invalidCell = cell; // Store the invalid cell
+                return;
             }
 
             updatedEntries.push({ date, time });
         });
 
-        // If negative values are found, show an error message and stop submission
-        if (hasNegativeValue) {
-            Swal.fire("Error", "Negative values are not allowed. Please correct the input.", "error");
+        // If invalid values are found, show an error message and focus on the invalid cell
+        if (hasInvalidValue) {
+            Swal.fire({
+                title: "Error",
+                text: errorMessage,
+                icon: "error",
+                didOpen: () => {
+                    if (invalidCell) {
+                        invalidCell.focus(); 
+                    }
+                }
+            }).then(() => {
+                setTimeout(() => {
+                    if (invalidCell) {
+                        invalidCell.focus(); 
+                    }
+                }, 1000); 
+            });
             return;
         }
-
 
         Swal.fire({
             title: "Do you want to save the changes?",
@@ -194,16 +225,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
+    // Parse time 
     function parseTime(timeStr) {
-        let match = timeStr.match(/(\d+)h\s*(\d*)m?/);
-        if (match) {
-            let hours = parseInt(match[1], 10);
-            let minutes = match[2] ? parseInt(match[2], 10) : 0;
-            return { hours, minutes };
+        let hours = 0;
+        let minutes = 0;
+
+        // Match hours (e.g., "8h" or "8h30m")
+        let hoursMatch = timeStr.match(/(\d+)h/);
+        if (hoursMatch) {
+            hours = parseInt(hoursMatch[1], 10);
         }
-        return { hours: 0, minutes: 0 };
+
+        // Match minutes (e.g., "30m" or "8h30m")
+        let minutesMatch = timeStr.match(/(\d+)m/);
+        if (minutesMatch) {
+            minutes = parseInt(minutesMatch[1], 10);
+        }
+
+        return { hours, minutes };
     }
 
+    // Calculate total time 
     function calculateTotalTime() {
         let totalMinutes = 0;
         let expectedMinutes = 0;
@@ -233,6 +275,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         deficientTimeEl.textContent = `${Math.floor(deficientMinutes / 60)}h ${deficientMinutes % 60}m`;
     }
 
+    // Generate table with blur validation
     function generateTable(year, month) {
         const dateRow = document.getElementById("dateRow");
         const timeRow = document.getElementById("timeRow");
@@ -246,22 +289,82 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             let th = document.createElement("th");
             th.textContent = `${day} (${dayName})`;
-
-            if (dayName === "Fri") {
-                th.classList.add("text-danger"); 
-            }
-
+            if (dayName === "Fri") th.classList.add("text-danger");
             dateRow.appendChild(th);
 
             let td = document.createElement("td");
             td.contentEditable = true;
             td.setAttribute("data-date", `${year}-${month}-${day}`);
             td.addEventListener("input", calculateTotalTime);
+
+            // Add blur event listener for validation
+            td.addEventListener("blur", function () {
+                let time = td.textContent.trim();
+                let previousValue = td.dataset.previousValue || ""; // Store previous valid value
+
+                if (time !== "") {
+                    if (!time.includes("h") && !time.includes("m")) {
+                        Swal.fire("Error", "Time must include 'h' or 'm' (e.g., 8h or 30m).", "error")
+                            .then(() => {
+                                td.textContent = previousValue;
+                                td.focus();
+                            });
+                        return;
+                    }
+
+                    let hoursMatch = time.match(/(-?\d+)h/);
+                    let minutesMatch = time.match(/(-?\d+)m/);
+                    let hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
+                    let minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+
+                    if (hours < 0 || minutes < 0) {
+                        Swal.fire("Error", "Negative values are not allowed.", "error")
+                            .then(() => {
+                                td.textContent = previousValue;
+                                td.focus();
+                            });
+                        return;
+                    }
+
+                    if (minutes > 59) {
+                        Swal.fire("Error", "Minutes cannot be greater than 59.", "error")
+                            .then(() => {
+                                td.textContent = previousValue;
+                                td.focus();
+                            });
+                        return;
+                    }
+
+                    if (time.includes(".")) {
+                        Swal.fire("Error", "Decimal values are not allowed.", "error")
+                            .then(() => {
+                                td.textContent = previousValue;
+                                td.focus();
+                            });
+                        return;
+                    }
+
+                    let timePattern = /^(\d+h)?(\d+m)?$/;
+                    if (time !== "" && !timePattern.test(time)) {
+                        Swal.fire("Error", "Invalid time format. Use 'XhYm' (e.g., 8h30m) or leave empty.", "error")
+                            .then(() => {
+                                td.textContent = previousValue; // Revert to previous valid value
+                                td.focus();
+                            });
+                        return;
+                    }
+                }
+
+                // If valid, store the current value as the previous valid value
+                td.dataset.previousValue = time || "0h0m"; // Default to "0h0m" if empty
+                calculateTotalTime(); // Recalculate totals after validation
+            });
+
             timeRow.appendChild(td);
         }
     }
 
-    // Load data 
+    // Load data (unchanged except for ensuring blur listeners are added)
     loadDataBtn.addEventListener("click", async () => {
         const selectedMonth = monthPicker.value;
         if (!selectedMonth) {
@@ -276,7 +379,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         let data = await response.json();
 
         if (data.error) {
-            // No data found for the selected month, generate a new table
             generateTable(year, month);
             totalTimeEl.textContent = "0h 0m";
             additionalTimeEl.textContent = "0h 0m";
@@ -284,10 +386,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        // Data found, populate the table
         generateTable(year, month);
-
-        // Populate the table with the fetched data
         data.timesheet.entries.forEach(entry => {
             let td = document.querySelector(`#timeRow td[data-date="${entry.date}"]`);
             if (td) {
@@ -295,73 +394,49 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
 
-        // Update the total, additional, and deficient time fields
         totalTimeEl.textContent = data.timesheet.totalTime;
         additionalTimeEl.textContent = data.timesheet.additionalTime;
         deficientTimeEl.textContent = data.timesheet.deficientTime;
     });
 
-    // Save the time stamps
+    // Save data without validation
     saveDataBtn.addEventListener("click", () => {
+        let [year, month] = monthPicker.value.split("-");
+        let date = new Date(year, month - 1);
+        let formattedMonth = date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+        let timesheetData = [];
+        document.querySelectorAll("#timeRow td").forEach(td => {
+            let date = td.getAttribute("data-date");
+            let time = td.textContent.trim() || "0h0m"; // Default to "0h0m" if empty
+            timesheetData.push({ date, time });
+        });
+
         Swal.fire({
-            title: "Do you want to save this timesheets?",
+            title: "Do you want to save this timesheet?",
             showDenyButton: true,
             showCancelButton: true,
             confirmButtonText: "Save",
-            denyButtonText: `Don't save`
+            denyButtonText: "Don't save"
         }).then((result) => {
             if (result.isConfirmed) {
-                let [year, month] = monthPicker.value.split("-");
-                let date = new Date(year, month - 1);
-                let formattedMonth = date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-
-                let timesheetData = [];
-                let hasNegativeValue = false;
-
-                document.querySelectorAll("#timeRow td").forEach(td => {
-                    let date = td.getAttribute("data-date");
-                    let time = td.textContent.trim();
-                    if (!time) { 
-                        time = "0h0m";
-                    }
-
-                    // Check for negative values in the time input
-                    let timePattern = /^(-?\d+h)?\s*(-?\d+m)?$/;
-                    if (timePattern.test(time)) {
-                        let hoursMatch = time.match(/(-?\d+)h/);
-                        let minutesMatch = time.match(/(-?\d+)m/);
-
-                        let hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
-                        let minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
-
-                        if (hours < 0 || minutes < 0) {
-                            hasNegativeValue = true; // Set flag if negative value is found
-                        }
-                    }
-
-                    timesheetData.push({ date, time });
-                });
-
-                // If negative values are found, show an error message and stop submission
-                if (hasNegativeValue) {
-                    Swal.fire("Error", "Negative values are not allowed. Please correct the input.", "error");
-                    return;
-                }
-
                 fetch("/api/v1/timesheet", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         id: userId,
                         name: userName,
                         timesheet: timesheetData,
-                        totaltime: totalTimeEl.textContent, 
+                        totaltime: totalTimeEl.textContent,
                         additionaltime: additionalTimeEl.textContent,
-                        deficienttime: deficientTimeEl.textContent, 
+                        deficienttime: deficientTimeEl.textContent,
                         month: formattedMonth
                     })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+                    return response.json();
+                })
                 .then(data => {
                     Swal.fire("Saved!", "Timesheet has been saved successfully.", "success")
                     .then(() => {
@@ -379,29 +454,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    // Reset function to clear form
+    // Reset form 
     function resetForm() {
         document.querySelectorAll("#timeRow td").forEach(td => {
             td.textContent = "";
         });
-
         totalTimeEl.textContent = "0h 0m";
         additionalTimeEl.textContent = "0h 0m";
         deficientTimeEl.textContent = "0h 0m";
-
         monthPicker.value = "";
-
         document.getElementById("dateRow").innerHTML = "<th>Date</th>";
         document.getElementById("timeRow").innerHTML = "<td>Time</td>";
-
         document.getElementById("timesheetContainer").innerHTML = "";
     }
 
-    // Logout action
+    // Logout action 
     logoutBtn.addEventListener("click", async () => {
         try {
             await fetch('/logout', { method: 'GET' });
-            window.location.href = "/"; // Redirect to login page
+            window.location.href = "/";
         } catch (error) {
             console.error("Logout error:", error);
         }
