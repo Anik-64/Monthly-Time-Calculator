@@ -247,9 +247,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (data.error) {
             // No data found for the selected month, generate a new table
             generateTable(year, month);
-            totalTimeEl.textContent = "";
-            additionalTimeEl.textContent = "";
-            deficientTimeEl.textContent = "";
+            totalTimeEl.textContent = "0h 0m";
+            additionalTimeEl.textContent = "0h 0m";
+            deficientTimeEl.textContent = "0h 0m";
             return;
         }
 
@@ -285,6 +285,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 let formattedMonth = date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
                 let timesheetData = [];
+                let hasNegativeValue = false;
 
                 document.querySelectorAll("#timeRow td").forEach(td => {
                     let date = td.getAttribute("data-date");
@@ -292,8 +293,29 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (!time) { 
                         time = "0h0m";
                     }
+
+                    // Check for negative values in the time input
+                    let timePattern = /^(-?\d+h)?\s*(-?\d+m)?$/;
+                    if (timePattern.test(time)) {
+                        let hoursMatch = time.match(/(-?\d+)h/);
+                        let minutesMatch = time.match(/(-?\d+)m/);
+
+                        let hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
+                        let minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+
+                        if (hours < 0 || minutes < 0) {
+                            hasNegativeValue = true; // Set flag if negative value is found
+                        }
+                    }
+
                     timesheetData.push({ date, time });
                 });
+
+                // If negative values are found, show an error message and stop submission
+                if (hasNegativeValue) {
+                    Swal.fire("Error", "Negative values are not allowed. Please correct the input.", "error");
+                    return;
+                }
 
                 fetch("/api/v1/timesheet", {
                     method: "POST",
