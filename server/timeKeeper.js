@@ -14,14 +14,14 @@ timeKeeperRouter.get('/:userId/:month', async (req, res) => {
 
         let monthDoc = await monthDocRef.get();
 
-        if (!monthDoc) {
+        let timesheetData = monthDoc.data();
+                
+        if (!timesheetData) {
             return res.status(404).json({ 
                 error: true,
                 message: 'No timesheet data found for this month' 
             });
         }
-
-        let timesheetData = monthDoc.data();
 
         res.status(200).json({
             error: false,
@@ -114,7 +114,6 @@ timeKeeperRouter.get('/:userId', async (req, res) => {
     }
 });
 
-
 // Updated route 
 timeKeeperRouter.put('/', async (req, res) => {
     function extractTime(timeStr) {
@@ -141,14 +140,14 @@ timeKeeperRouter.put('/', async (req, res) => {
         let userDoc = await userDocRef.get();
         let monthDoc = await monthsCollectionRef.get();
 
-        if (!userDoc) {
+        if (!userDoc.data()) {
             return res.status(404).json({ 
                 error: true, 
-                message: "Timesheet not found" 
+                message: "User not found" 
             });
         }
 
-        if (!monthDoc) {
+        if (!monthDoc.data()) {
             return res.status(404).json({ 
                 error: true, 
                 message: `No timesheet found for ${month}` 
