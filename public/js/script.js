@@ -21,8 +21,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             let response = await fetch('/api/v1/user/');
             let user = await response.json();
 
-            console.log(user);
-
             if (response.status == 200) {
                 userNameEl.textContent = user.name;
                 if (user.photo) {
@@ -124,9 +122,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Update timestamps
     async function updateTimesheet(month) {
         let updatedEntries = [];
+        // document.querySelectorAll(".editable-time").forEach(cell => {
+        //     updatedEntries.push({ date: cell.getAttribute("data-date"), time: cell.textContent.trim() });
+        // });
+        let hasNegativeValue = false; // Flag to check for negative values
+
+        // Collect updated entries and validate for negative values
         document.querySelectorAll(".editable-time").forEach(cell => {
-            updatedEntries.push({ date: cell.getAttribute("data-date"), time: cell.textContent.trim() });
+            let date = cell.getAttribute("data-date");
+            let time = cell.textContent.trim();
+            if (!time) {
+                time = "0h0m";
+            }
+
+            // Check for negative values in the time input
+            let timePattern = /^(-?\d+h)?\s*(-?\d+m)?$/;
+            if (timePattern.test(time)) {
+                let hoursMatch = time.match(/(-?\d+)h/);
+                let minutesMatch = time.match(/(-?\d+)m/);
+
+                let hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
+                let minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+
+                if (hours < 0 || minutes < 0) {
+                    hasNegativeValue = true; // Set flag if negative value is found
+                }
+            }
+
+            updatedEntries.push({ date, time });
         });
+
+        // If negative values are found, show an error message and stop submission
+        if (hasNegativeValue) {
+            Swal.fire("Error", "Negative values are not allowed. Please correct the input.", "error");
+            return;
+        }
+
 
         Swal.fire({
             title: "Do you want to save the changes?",
