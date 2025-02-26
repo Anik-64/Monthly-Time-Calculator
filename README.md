@@ -1,1 +1,1 @@
-# Monthly Time Calculator
+# Monthly Time Calculator and Report Generator 
