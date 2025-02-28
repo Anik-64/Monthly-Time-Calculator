@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- SEO Meta Tags -->
     <meta name="description" content="Track and manage your time effortlessly with TimeCalc. Calculate work hours, set personal goals, and generate professional reports for free.">
     <meta name="keywords" content="time tracking, work hours calculator, goal tracking, time management, free time tracker">
     <meta name="author" content="TimeCalc">
     <meta name="robots" content="index, follow">
 
-    <!-- Open Graph Meta Tags (for social media sharing) -->
     <meta property="og:title" content="TimeCalc - Free Time Tracking and Management Tool">
     <meta property="og:description" content="Track and manage your time effortlessly with TimeCalc. Calculate work hours, set personal goals, and generate professional reports for free.">
-    <meta property="og:image" content="https://yourwebsite.com/logo.png">
-    <meta property="og:url" content="https://yourwebsite.com">
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/alleventsair.appspot.com/o/files%2Fimages%2FzqsvI_1740747232965.png?alt=media&token=7cdba91a-b989-45af-bf5a-e232c05de814">
+    <meta property="og:url" content="https://monthly-time-calculator.onrender.com">
 
-    <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="TimeCalc - Free Time Tracking and Management Tool">
     <meta name="twitter:description" content="Track and manage your time effortlessly with TimeCalc. Calculate work hours, set personal goals, and generate professional reports for free.">
-    <meta name="twitter:image" content="https://yourwebsite.com/logo.png">
+    <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/alleventsair.appspot.com/o/files%2Fimages%2FzqsvI_1740747232965.png?alt=media&token=7cdba91a-b989-45af-bf5a-e232c05de814">
+
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "TimeCalc",
+            "url": "https://monthly-time-calculator.onrender.com",
+            "description": "Track and manage your time effortlessly with TimeCalc. Calculate work hours, set personal goals, and generate professional reports for free.",
+        }
+    </script>
     
     <title>Monthly Time Calculator</title>
-    <link rel="icon" type="image/png" href="./logo/timeSave.png">
+    <link rel="icon" type="image/png" href="./logo/timeSave.png" alt="TimeCalc Logo">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"> 
@@ -35,9 +42,7 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <div class="logo-container">
-                        <!-- <img class="w-12 h-12 object-contain" src="./logo/TimeCalculatorLogo.png" alt="TimeCalc Logo"> -->
-                        <!-- <img class="w-12 h-12 object-contain" src="./logo/savetime2.png" alt="TimeCalc Logo"> -->
-                        <img class="w-12 h-12 object-contain" src="./logo/timeSave.png" alt="TimeCalc Logo">
+                        <img class="w-12 h-12 object-contain" src="./logo/timeSave.png" alt="TimeCalc Logo" loading="lazy">
                         <span class="text-2xl font-bold text-indigo-600">TimeCalc</span>
                     </div>
                 </div>
@@ -185,11 +190,6 @@
                 <button class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300">
                     Continue with Email
                 </button>
-
-                <!-- Terms and Conditions -->
-                <!-- <p class="text-gray-500 text-sm mt-6">
-                    By signing up, you agree to our <a href="#" class="text-indigo-600 hover:underline">Terms of Service</a> and <a href="#" class="text-indigo-600 hover:underline">Privacy Policy</a>.
-                </p> -->
             </div>
         </div>
     </div>
@@ -223,12 +223,6 @@
                 modal.style.display = 'none';
             }
         });
-
-        // Google Sign-In Button (Placeholder for actual implementation)
-        // const googleSignInBtn = document.getElementById('google-signin-btn');
-        // googleSignInBtn.addEventListener('click', () => {
-        //     alert('Google Sign-In functionality will be implemented here.');
-        // });
     </script>
 </body>
 </html>
