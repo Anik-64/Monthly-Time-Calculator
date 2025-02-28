@@ -3,18 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Monthly Time Calculator</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Track and manage your time effortlessly with TimeCalc. Calculate work hours, set personal goals, and generate professional reports for free.">
+    <meta name="keywords" content="time tracking, work hours calculator, goal tracking, time management, free time tracker">
+    <meta name="author" content="TimeCalc">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph Meta Tags (for social media sharing) -->
+    <meta property="og:title" content="TimeCalc - Free Time Tracking and Management Tool">
+    <meta property="og:description" content="Track and manage your time effortlessly with TimeCalc. Calculate work hours, set personal goals, and generate professional reports for free.">
+    <meta property="og:image" content="https://yourwebsite.com/logo.png">
+    <meta property="og:url" content="https://yourwebsite.com">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TimeCalc - Free Time Tracking and Management Tool">
+    <meta name="twitter:description" content="Track and manage your time effortlessly with TimeCalc. Calculate work hours, set personal goals, and generate professional reports for free.">
+    <meta name="twitter:image" content="https://yourwebsite.com/logo.png">
+    
+    <title>Monthly Time Calculator</title>
+    <link rel="icon" type="image/png" href="./logo/timeSave.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"> 
     <link rel="stylesheet" href="./css/login.css">
 </head>
-<body>
-    <div class="login-container">
-        <img class="clock-icon" src="./logo/clock.png" alt="Clock Icon">
-        <h1>Welcome to Monthly Time Calculator</h1>
-        <p>Calculate your monthly work hours effortlessly.</p>
-        <a class="google-btn" href="/auth/google">
-            <img src="./logo/google.svg" alt="Google Logo">
-            Sign in with Google
-        </a>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="logo-container">
+                        <!-- <img class="w-12 h-12 object-contain" src="./logo/TimeCalculatorLogo.png" alt="TimeCalc Logo"> -->
+                        <!-- <img class="w-12 h-12 object-contain" src="./logo/savetime2.png" alt="TimeCalc Logo"> -->
+                        <img class="w-12 h-12 object-contain" src="./logo/timeSave.png" alt="TimeCalc Logo">
+                        <span class="text-2xl font-bold text-indigo-600">TimeCalc</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#features" class="text-gray-600 hover:text-indigo-600 px-3 py-2 transition duration-300">Features</a>
+                    <a href="#how-it-works" class="text-gray-600 hover:text-indigo-600 px-3 py-2 transition duration-300">How It Works</a>
+                    <a href="#signup" id="signup-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition duration-300">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-indigo-600 text-white pt-32 pb-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center" data-aos="fade-up">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6">Track Your Time Your Way - Free Forever</h1>
+                <p class="text-xl mb-8 max-w-2xl mx-auto">Whether you're managing work hours or chasing personal goals, TimeCalc helps you calculate and report your time effortlessly.</p>
+                <a href="#signup" id="hero-signup-btn" class="bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-100 transition duration-300 hover-scale">Get Started Free</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12" data-aos="fade-up">Why Choose TimeCalc?</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-6 bg-white rounded-lg shadow-md hover-scale" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Flexible Tracking</h3>
+                    <p class="text-gray-600">Calculate daily work hours or goal-oriented time with ease.</p>
+                </div>
+                <div class="text-center p-6 bg-white rounded-lg shadow-md hover-scale" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Professional Reports</h3>
+                    <p class="text-gray-600">Generate polished reports for work or personal progress.</p>
+                </div>
+                <div class="text-center p-6 bg-white rounded-lg shadow-md hover-scale" data-aos="fade-up" data-aos-delay="300">
+                    <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Share Your Progress</h3>
+                    <p class="text-gray-600">Collaborate with teams or keep track solo - your choice.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12" data-aos="fade-up">How TimeCalc Works For You</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="p-6 bg-white rounded-lg shadow-md hover-scale" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-indigo-600 text-white rounded-full flex items-center justify-center mr-4 text-xl font-bold">1</div>
+                        <h3 class="text-xl font-semibold">For Your Job</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Track your daily work hours effortlessly:</p>
+                    <ul class="text-gray-600 space-y-2 list-disc list-inside">
+                        <li>Input your work start and end times</li>
+                        <li>Add breaks or overtime</li>
+                        <li>Get monthly totals and professional reports</li>
+                    </ul>
+                    <p class="text-gray-600 mt-4">Perfect for employees, freelancers, or managers.</p>
+                </div>
+                <div class="p-6 bg-white rounded-lg shadow-md hover-scale" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-indigo-600 text-white rounded-full flex items-center justify-center mr-4 text-xl font-bold">2</div>
+                        <h3 class="text-xl font-semibold">For Your Goals</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Track daily time to achieve your ambitions:</p>
+                    <ul class="text-gray-600 space-y-2 list-disc list-inside">
+                        <li>Set study or project time goals</li>
+                        <li>Log your daily progress</li>
+                        <li>Visualize your achievements with reports</li>
+                    </ul>
+                    <p class="text-gray-600 mt-4">Ideal for students or anyone with personal targets.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Signup Section -->
+    <section id="signup" class="bg-indigo-600 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold mb-6" data-aos="fade-up">Ready to Take Control of Your Time?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Whether it’s work or personal goals, start using TimeCalc today - completely free.</p>
+            <a href="#" id="cta-signup-btn" class="bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-indigo-100 transition duration-300 hover-scale" data-aos="fade-up" data-aos-delay="200">Sign Up Now</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>© 2025 TimeCalc. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <!-- Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="modal-content relative bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-95 hover:scale-100">
+            <!-- Close Button -->
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Modal Content -->
+            <div class="p-8 text-center">
+                <div class="mb-6">
+                    <img src="./logo/timeSave.png" alt="Logo" class="w-16 h-16 mx-auto">
+                </div>
+
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome to TimeCalc</h2>
+                <p class="text-gray-600 mb-6">Sign up to start tracking your time effortlessly.</p>
+
+                <a id="google-signin-btn" href="/auth/google" class="w-full flex items-center justify-center bg-white border border-gray-200 rounded-lg px-6 py-3 text-gray-700 hover:bg-gray-50 hover:shadow-md transition-all duration-300">
+                    <img src="./logo/google.svg" alt="Google Logo" class="w-6 h-6 mr-3" loading="lazy">
+                    <span class="font-medium">Sign up with Google</span>
+                </a>
+
+                <div class="flex items-center my-6">
+                    <div class="flex-1 border-t border-gray-200"></div>
+                    <span class="mx-4 text-gray-400">or</span>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
+
+                <!-- Email Sign-Up Option -->
+                <div class="mb-6">
+                    <input type="email" placeholder="Enter your email" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <button class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300">
+                    Continue with Email
+                </button>
+
+                <!-- Terms and Conditions -->
+                <!-- <p class="text-gray-500 text-sm mt-6">
+                    By signing up, you agree to our <a href="#" class="text-indigo-600 hover:underline">Terms of Service</a> and <a href="#" class="text-indigo-600 hover:underline">Privacy Policy</a>.
+                </p> -->
+            </div>
+        </div>
     </div>
+
+    <!-- AOS Animation Script -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+        });
+
+        // Modal functionality
+        const signupBtns = document.querySelectorAll('#signup-btn, #hero-signup-btn, #cta-signup-btn');
+        const modal = document.getElementById('signup-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        signupBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                modal.style.display = 'flex';
+            });
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Google Sign-In Button (Placeholder for actual implementation)
+        // const googleSignInBtn = document.getElementById('google-signin-btn');
+        // googleSignInBtn.addEventListener('click', () => {
+        //     alert('Google Sign-In functionality will be implemented here.');
+        // });
+    </script>
 </body>
 </html>
