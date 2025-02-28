@@ -6,6 +6,7 @@
     <title>Monthly Work Time Calculator</title>
     <link rel="icon" type="image/png" href="./logo/timeSave.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="./css/style.css">
 </head>
@@ -59,6 +60,96 @@
         </div>
     </div>
 
+</div>
+
+<!-- Modal for user input after login -->
+<div id="userInputModal" class="modal fade" tabindex="-1" aria-labelledby="userInputModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userInputModalLabel">Welcome! Let's get started</h5>
+                <!-- Remove the close button -->
+            </div>
+            <div class="modal-body">
+                <div id="initialButtons">
+                    <button id="forJobBtn" class="btn btn-primary w-100 mb-3">For your job</button>
+                    <button id="forGoalBtn" class="btn btn-success w-100">For your goal or daily target</button>
+                </div>
+                <div id="jobForm" class="d-none">
+                    <div class="row mb-3">
+                        <div class="col">Mon</div>
+                        <div class="col">Tue</div>
+                        <div class="col">Wed</div>
+                        <div class="col">Thu</div>
+                        <div class="col">&nbsp;Fri</div>
+                        <div class="col">&nbsp;Sat</div>
+                        <div class="col">&nbsp;Sun</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="salaryInput" class="form-label">Salary</label>
+                            <input type="text" id="salaryInput" class="form-control" placeholder="Enter your salary">
+                            <small class="invalid-feedback">Salary must be a positive number.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="currencySelect" class="form-label">Currency</label>
+                            <select id="currencySelect" class="form-select">
+                                <option value="BDT (৳‎)">BDT (৳‎)</option>
+                                <option value="INR (₹‎‎)">INR (₹‎)</option>
+                                <option value="USD ($)">USD ($)</option>
+                                <option value="EUR (€‎)">EUR (€‎)</option>
+                                <option value="GBP (£‎)">GBP (£‎)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button id="goBackBtn" class="btn btn-secondary">Go back</button>
+                        <button id="submitJobBtn" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+                <div id="goalForm" class="d-none">
+                    <div class="mb-3">
+                        <label for="dailyTargetInput" class="form-label">Daily target hours</label>
+                        <input type="text" id="dailyTargetInput" class="form-control" placeholder="Enter daily target hours">
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button id="goBackBtnGoal" class="btn btn-secondary">Go back</button>
+                        <button id="submitGoalBtn" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="./js/script.js"></script>
