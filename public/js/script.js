@@ -15,6 +15,149 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const STANDARD_WORK_HOURS = { "Mon": 8, "Tue": 8, "Wed": 8, "Thu": 4, "Sat": 8, "Sun": 8 };
 
+    const userInputModal = new bootstrap.Modal(document.getElementById('userInputModal'), {
+        backdrop: 'static', 
+        keyboard: false 
+    });
+
+    // Show modal after login
+    userInputModal.show();
+
+    // Event listeners for initial buttons
+    document.getElementById('forJobBtn').addEventListener('click', () => {
+        document.getElementById('initialButtons').classList.add('d-none');
+        document.getElementById('jobForm').classList.remove('d-none');
+    });
+
+    document.getElementById('forGoalBtn').addEventListener('click', () => {
+        document.getElementById('initialButtons').classList.add('d-none');
+        document.getElementById('goalForm').classList.remove('d-none');
+    });
+
+    // Go back buttons
+    document.getElementById('goBackBtn').addEventListener('click', () => {
+        document.getElementById('jobForm').classList.add('d-none');
+        document.getElementById('initialButtons').classList.remove('d-none');
+    });
+
+    document.getElementById('goBackBtnGoal').addEventListener('click', () => {
+        document.getElementById('goalForm').classList.add('d-none');
+        document.getElementById('initialButtons').classList.remove('d-none');
+    });
+
+    function validateHours(input) {
+        const value = input.value.trim();
+        const errorMessage = input.nextElementSibling; 
+
+        if (value === "") {
+            input.classList.remove("not-invalid");
+            errorMessage.style.display = "none"; 
+            return; 
+        }
+
+        const number = parseFloat(value);
+        if (isNaN(number) || number < 0 || number > 24 || !Number.isInteger(number)) {
+            input.classList.add("not-invalid");
+            errorMessage.style.display = "block"; 
+            return;
+        }
+
+        input.classList.remove("not-invalid");
+        errorMessage.style.display = "none";
+        return;
+    }
+
+    function validateSalary(input) {
+        const value = input.value.trim();
+        const errorMessage = input.nextElementSibling; 
+
+        if (value === "") {
+            input.classList.add("not-invalid");
+            errorMessage.style.display = "block"; 
+            return; 
+        }
+
+        const number = parseFloat(value);
+        if (isNaN(number) || number < 0 || !Number.isInteger(number)) {
+            input.classList.add("not-invalid");
+            errorMessage.style.display = "block"; 
+            return;
+        }
+
+        input.classList.remove("not-invalid");
+        errorMessage.style.display = "none";
+        return;
+    }
+
+    document.querySelectorAll('.work-hour').forEach(input => {
+        input.addEventListener('blur', () => {
+            validateHours(input);
+        });
+    });
+
+    // Add blur event listener to salary input
+    const salaryInput = document.getElementById('salaryInput');
+    salaryInput.addEventListener('blur', () => {
+        validateSalary(salaryInput);
+    });
+
+
+    // Submit job form
+    document.getElementById('submitJobBtn').addEventListener('click', async () => {
+        const workHours = Array.from(document.querySelectorAll('.work-hour')).map(input => input.value);
+        const salary = document.getElementById('salaryInput').value;
+        const currency = document.getElementById('currencySelect').value;
+
+        // Validate inputs
+        if (workHours.some(hour => isNaN(hour) || isNaN(salary))) {
+            Swal.fire("Error", "Please enter valid numbers for work hours and salary.", "error");
+            return;
+        }
+
+        // Call API to save job details
+        try {
+            const response = await fetch('/api/v1/user/job', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, workHours, salary, currency })
+            });
+
+            if (!response.ok) throw new Error('Failed to save job details');
+            Swal.fire("Success", "Job details saved successfully!", "success");
+            userInputModal.hide();
+        } catch (error) {
+            Swal.fire("Error", "Failed to save job details. Please try again.", "error");
+            console.error(error);
+        }
+    });
+
+    // Submit goal form
+    document.getElementById('submitGoalBtn').addEventListener('click', async () => {
+        const dailyTarget = document.getElementById('dailyTargetInput').value;
+
+        // Validate input
+        if (isNaN(dailyTarget)) {
+            Swal.fire("Error", "Please enter a valid number for daily target hours.", "error");
+            return;
+        }
+
+        // Call API to save goal details
+        try {
+            const response = await fetch('/api/v1/user/goal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, dailyTarget })
+            });
+
+            if (!response.ok) throw new Error('Failed to save goal details');
+            Swal.fire("Success", "Goal details saved successfully!", "success");
+            userInputModal.hide();
+        } catch (error) {
+            Swal.fire("Error", "Failed to save goal details. Please try again.", "error");
+            console.error(error);
+        }
+    });
+
     // Fetch user profile 
     async function fetchUserProfile() {
         try {
