@@ -25,6 +25,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         keyboard: false 
     });
 
+    showShimmer();
+
+    // Function to show shimmer overlay
+    function showShimmer() {
+        const shimmer = document.getElementById('shimmer');
+        shimmer.style.display = 'block';
+    }
+
+    // Function to hide shimmer overlay
+    function hideShimmer() {
+        const shimmer = document.getElementById('shimmer');
+        shimmer.style.display = 'none';
+    }
+
     // Fetch user profile 
     async function fetchUserProfile() {
         try {
@@ -44,6 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Fetch user configuration
     async function fetchUserConfiguration() {
+        showShimmer();
         try {
             // Fetch goal configuration
             let type = 'job';
@@ -62,6 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     Sun: jobData.configurations.workHours['Sun']
                 }; 
                 updateConfigurationUI("job", jobData.configurations);
+                hideShimmer();
                 return { type: 'job', data: jobData };
             }
 
@@ -83,10 +99,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     Sun: goalData.configurations.dailyTarget
                 };
                 updateConfigurationUI("goal", goalData.configurations);
+                hideShimmer();
                 return { type: 'goal', data: goalData };
             }
 
             // User has no configuration
+            updateConfigurationUI("none", {});
+            hideShimmer();
             return null;
         } catch (error) {
             console.error("Error fetching user configuration:", error);

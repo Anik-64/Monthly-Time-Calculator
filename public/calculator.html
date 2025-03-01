@@ -23,8 +23,8 @@
     </header>
 
     <div class="border shadow p-2 bg-body rounded">
-        <div class="d-flex mb-3">
-            <input type="month" id="monthPicker" class="form-control w-25"> &nbsp;&nbsp;
+        <div class="d-flex mb-3 gap-2">
+            <input type="month" id="monthPicker" class="form-control w-25">
             <button id="loadData" class="btn btn-primary">📅 Load Month</button>
         </div>
     
@@ -43,7 +43,7 @@
             </table>
         </div>
     
-        <div class="summary mt-4 mb-4 p-3">
+        <!-- <div class="summary mt-4 mb-4 p-3">
             <div class="row">
                 <div class="col-md-6 border rounded p-2">
                     <h6>📊 Summary</h6>
@@ -56,14 +56,65 @@
                     <p>Type: <span id="configType">N/A</span></p>
                     <p>Work Hours: </p>
                     <ul id="workHoursList">
-                        <!-- Work hours will be dynamically populated here -->
+
                     </ul>
                     <p class="motivation">Motivation: <span id="motivation">N/A</span></p>
                     <p class="salary">Salary: <span id="configSalary">N/A</span> <span id="configCurrency">N/A</span></p>
                 </div>
             </div>
-        </div>
+        </div> -->
     
+        <div class="summary mt-2 mb-3 bg-white shadow-sm rounded position-relative">
+            <div class="shimmer-wrapper" id="shimmer" style="display: none;">
+                <div class="shimmer"></div>
+            </div>
+
+            <div class="row g-2 p-2" id="summaryContent">
+                <div class="col-md-6">
+                    <div class="stats-card h-100 p-3 bg-gradient-indigo rounded">
+                        <h6 class="text-primary mb-2">📊 Summary</h6>
+                        <div class="stats-item mb-2">
+                            <span class="fw-medium">Total Time:</span>
+                            <span id="totalTime" class="fw-semibold">0h 0m</span>
+                        </div>
+                        <div class="stats-item mb-2 text-success">
+                            <span class="fw-medium">Additional Time:</span>
+                            <span id="additionalTime" class="fw-semibold">0h 0m</span>
+                        </div>
+                        <div class="stats-item text-danger">
+                            <span class="fw-medium">Deficient Time:</span>
+                            <span id="deficientTime" class="fw-semibold">0h 0m</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="config-card h-100 p-3 bg-gradient-light rounded">
+                        <h6 class="text-dark mb-2">⚙️ Configuration</h6>
+                        <div class="config-item mb-2">
+                            <span class="fw-medium">Type:</span>
+                            <span id="configType">N/A</span>
+                        </div>
+                        <div class="config-item mb-2">
+                            <span class="fw-medium">Work Hours:</span>
+                            <ul id="workHoursList" class="list-unstyled mt-1 small">
+
+                            </ul>
+                        </div>
+                        <div class="config-item motivation">
+                            <span class="fw-medium">Motivation:</span>
+                            <span id="motivation">N/A</span>
+                        </div>
+                        <div class="config-item salary">
+                            <span class="fw-medium">Salary:</span>
+                            <span>
+                                <span id="configSalary">N/A</span>
+                                <span id="configCurrency" class="me-1">N/A</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <button id="saveData" class="btn btn-success">Save Timesheet</button>
     </div>
 

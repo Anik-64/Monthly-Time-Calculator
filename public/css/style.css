@@ -50,38 +50,108 @@ p {
 }
 
 .summary {
-    /* background-color: #f8f9fa; */
-    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    position: relative; 
+    overflow: hidden;
 }
 
 .summary h6 {
-    color: #333;
-    font-weight: bold;
-    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.summary p {
-    margin-bottom: 0.5rem;
+.stats-card, .config-card {
+    transition: transform 0.2s ease;
 }
 
-/* Configuration Section */
-.configuration-summary ul {
-    list-style-type: none;
-    padding-left: 0;
-    margin-bottom: 0.5rem;
+.stats-card:hover, .config-card:hover {
+    transform: translateY(-2px);
 }
 
-.configuration-summary ul li {
-    margin-bottom: 0.25rem;
+.stats-item, .config-item {
+    font-size: 0.95rem;
 }
 
-/* Dynamic Visibility */
-.motivation,
-.salary {
-    display: block; /* Default visibility */
+.config-item ul li {
+    padding: 0.1rem 0;
+    color: #495057;
+}
+
+.config-item ul li strong {
+    color: #212529;
+}
+
+.bg-gradient-indigo {
+    background: linear-gradient(135deg, #eef2ff 0%, #dbeafe 100%);
+}
+
+.bg-gradient-light {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
 }
 
 .motivation.hidden,
 .salary.hidden {
-    display: none; /* Hide elements */
+    display: none !important;
+}
+
+@media (max-width: 767.98px) {
+    .stats-item, .config-item {
+        font-size: 0.9rem;
+    }
+    
+    .summary h6 {
+        font-size: 1rem;
+    }
+    
+    .w-50 {
+        width: 60% !important;
+    }
+}
+
+.shimmer-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent; 
+    pointer-events: none; 
+    z-index: 1;
+}
+
+.shimmer {
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.5) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+#summaryContent {
+    position: relative;
+    z-index: 0;
+    transition: filter 0.3s ease;
+}
+
+#summaryContent.blurred {
+    filter: blur(100px);
 }
