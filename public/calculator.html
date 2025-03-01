@@ -43,11 +43,25 @@
             </table>
         </div>
     
-        <div class="summary mt-4 mb-4 p-3 border rounded">
-            <h5>📊 Summary</h5>
-            <p><strong>Total Time:</strong> <span id="totalTime">0h 0m</span></p>
-            <p class="text-success"><strong>Additional Time:</strong> <span id="additionalTime">0h 0m</span></p>
-            <p class="text-danger"><strong>Deficient Time:</strong> <span id="deficientTime">0h 0m</span></p>
+        <div class="summary mt-4 mb-4 p-3">
+            <div class="row">
+                <div class="col-md-6 border rounded p-2">
+                    <h6>📊 Summary</h6>
+                    <p><strong>Total Time:</strong> <span id="totalTime">0h 0m</span></p>
+                    <p class="text-success"><strong>Additional Time:</strong> <span id="additionalTime">0h 0m</span></p>
+                    <p class="text-danger"><strong>Deficient Time:</strong> <span id="deficientTime">0h 0m</span></p>
+                </div>
+                <div class="col-md-5 offset-1 configuration-summary border rounded p-2">
+                    <h6>⚙️ Configuration</h6>
+                    <p>Type: <span id="configType">N/A</span></p>
+                    <p>Work Hours: </p>
+                    <ul id="workHoursList">
+                        <!-- Work hours will be dynamically populated here -->
+                    </ul>
+                    <p class="motivation">Motivation: <span id="motivation">N/A</span></p>
+                    <p class="salary">Salary: <span id="configSalary">N/A</span> <span id="configCurrency">N/A</span></p>
+                </div>
+            </div>
         </div>
     
         <button id="saveData" class="btn btn-success">Save Timesheet</button>

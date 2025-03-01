@@ -49,10 +49,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             let type = 'job';
             const jobResponse = await fetch(`/api/v1/configuration/${userId}/${type}`);
             const jobData = await jobResponse.json();
-            console.log("Job: " + jobData.configurations);
+            // console.log("Job: " + jobData.configurations);
 
             if (jobResponse.ok && jobData) {
-                // User has goal configuration
                 STANDARD_WORK_HOURS = { 
                     Mon: jobData.configurations.workHours['Mon'],
                     Tue: jobData.configurations.workHours['Tue'],
@@ -61,7 +60,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     Fri: jobData.configurations.workHours['Fri'],
                     Sat: jobData.configurations.workHours['Sat'],
                     Sun: jobData.configurations.workHours['Sun']
-                }; // Set STANDARD_WORK_HOURS
+                }; 
+                updateConfigurationUI("job", jobData.configurations);
                 return { type: 'job', data: jobData };
             }
 
@@ -70,10 +70,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const goalResponse = await fetch(`/api/v1/configuration/${userId}/${type}`);
             const goalData = await goalResponse.json();
 
-            console.log("Goal: " + goalData.configurations.dailyTarget);
+            // console.log("Goal: " + goalData.configurations.dailyTarget);
 
             if (goalResponse.ok && goalData) {
-                // User has job configuration
                 STANDARD_WORK_HOURS = { 
                     Mon: goalData.configurations.dailyTarget,
                     Tue: goalData.configurations.dailyTarget,
@@ -83,6 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     Sat: goalData.configurations.dailyTarget,
                     Sun: goalData.configurations.dailyTarget
                 };
+                updateConfigurationUI("goal", goalData.configurations);
                 return { type: 'goal', data: goalData };
             }
 
@@ -100,7 +100,63 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!config) {
             userInputModal.show(); 
         } else {
-            console.log("User configuration found:", config);
+            // console.log("User configuration found:", config);
+        }
+    }
+
+    // Function to update the right-side UI with configuration data
+    function updateConfigurationUI(type, configurations) {
+        const configTypeEl = document.getElementById('configType');
+        const workHoursListEl = document.getElementById('workHoursList');
+        const configSalaryEl = document.getElementById('configSalary');
+        const configCurrencyEl = document.getElementById('configCurrency');
+        const motivationEl = document.getElementById('motivation');
+        const motivationSection = document.querySelector(".motivation");
+        const salarySection = document.querySelector(".salary");
+
+        // Reset UI
+        configTypeEl.textContent = 'N/A';
+        workHoursListEl.innerHTML = '<li>No work hours configured.</li>';
+        configSalaryEl.textContent = 'N/A';
+        configCurrencyEl.textContent = 'N/A';
+        motivationEl.textContent = 'N/A';
+
+        motivationSection.classList.remove("hidden");
+        salarySection.classList.remove("hidden");
+
+        if (type === 'job') {
+            configTypeEl.textContent = 'Job';
+            workHoursListEl.innerHTML = `
+                <li>&nbsp&nbspMon - ${configurations.workHours.Mon} hours</li>
+                <li>&nbsp&nbspTue - ${configurations.workHours.Tue} hours</li>
+                <li>&nbsp&nbspWed - ${configurations.workHours.Wed} hours</li>
+                <li>&nbsp&nbspThu - ${configurations.workHours.Thu} hours</li>
+                <li>&nbsp&nbspFri - ${configurations.workHours.Fri} hours</li>
+                <li>&nbsp&nbspSat - ${configurations.workHours.Sat} hours</li>
+                <li>&nbsp&nbspSun - ${configurations.workHours.Sun} hours</li>
+            `;
+            configSalaryEl.textContent = configurations.salary;
+            configCurrencyEl.textContent = configurations.currency;
+            motivationSection.classList.add("hidden");
+        } else if (type === 'goal') {
+            configTypeEl.textContent = 'Goal';
+            workHoursListEl.innerHTML = `
+                <li>Daily Target-> <strong>${configurations.dailyTarget} hours</strong></li>
+            `;
+            motivationEl.textContent = configurations.comment;
+
+            // Hide salary and currency sections for goal type
+            salarySection.classList.add("hidden");
+        } else if (type === 'none') {
+            configTypeEl.textContent = 'No Configuration';
+            workHoursListEl.innerHTML = '<li>No work hours configured.</li>';
+            configSalaryEl.textContent = 'N/A';
+            configCurrencyEl.textContent = 'N/A';
+        } else if (type === 'error') {
+            configTypeEl.textContent = 'Error';
+            workHoursListEl.innerHTML = '<li>Failed to fetch configuration.</li>';
+            configSalaryEl.textContent = 'N/A';
+            configCurrencyEl.textContent = 'N/A';
         }
     }
 

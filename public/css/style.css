@@ -25,10 +25,6 @@ h2 {
     cursor: pointer;
 }
 
-.summary {
-    background: #ffffff;
-}
-
 p {
     margin: 0;
     font-size: 1.1rem;
@@ -51,4 +47,41 @@ p {
 
 .not-invalid + .invalid-feedback {
     display: block; 
+}
+
+.summary {
+    /* background-color: #f8f9fa; */
+    border-radius: 8px;
+}
+
+.summary h6 {
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.summary p {
+    margin-bottom: 0.5rem;
+}
+
+/* Configuration Section */
+.configuration-summary ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0.5rem;
+}
+
+.configuration-summary ul li {
+    margin-bottom: 0.25rem;
+}
+
+/* Dynamic Visibility */
+.motivation,
+.salary {
+    display: block; /* Default visibility */
+}
+
+.motivation.hidden,
+.salary.hidden {
+    display: none; /* Hide elements */
 }
