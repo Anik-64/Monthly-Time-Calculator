@@ -17,15 +17,92 @@ document.addEventListener("DOMContentLoaded", async () => {
     let userId = '';
     let userName = '';
 
-    const STANDARD_WORK_HOURS = { "Mon": 8, "Tue": 8, "Wed": 8, "Thu": 4, "Sat": 8, "Sun": 8 };
+    // const STANDARD_WORK_HOURS = { "Mon": 8, "Tue": 8, "Wed": 8, "Thu": 4, "Sat": 8, "Sun": 8 };
+    let STANDARD_WORK_HOURS = {};
 
     const userInputModal = new bootstrap.Modal(document.getElementById('userInputModal'), {
         backdrop: 'static', 
         keyboard: false 
     });
 
-    // Show modal after login
-    userInputModal.show();
+    // Fetch user profile 
+    async function fetchUserProfile() {
+        try {
+            let response = await fetch('/api/v1/user/');
+            let user = await response.json();
+            if (response.status == 200) {
+                userNameEl.textContent = user.name;
+                userPhotoEl.src = user.photo || "../logo/image.png";
+                userPhotoEl.style.display = "block";
+                userId = user.id;
+                userName = user.name;
+            }
+        } catch (error) {
+            console.error("User not logged in:", error);
+        }
+    }
+
+    // Fetch user configuration
+    async function fetchUserConfiguration() {
+        try {
+            // Fetch goal configuration
+            let type = 'job';
+            const jobResponse = await fetch(`/api/v1/configuration/${userId}/${type}`);
+            const jobData = await jobResponse.json();
+            console.log("Job: " + jobData.configurations);
+
+            if (jobResponse.ok && jobData) {
+                // User has goal configuration
+                STANDARD_WORK_HOURS = { 
+                    Mon: jobData.configurations.workHours['Mon'],
+                    Tue: jobData.configurations.workHours['Tue'],
+                    Wed: jobData.configurations.workHours['Wed'],
+                    Thu: jobData.configurations.workHours['Thu'],
+                    Fri: jobData.configurations.workHours['Fri'],
+                    Sat: jobData.configurations.workHours['Sat'],
+                    Sun: jobData.configurations.workHours['Sun']
+                }; // Set STANDARD_WORK_HOURS
+                return { type: 'job', data: jobData };
+            }
+
+            // Fetch job configuration
+            type = 'goal';
+            const goalResponse = await fetch(`/api/v1/configuration/${userId}/${type}`);
+            const goalData = await goalResponse.json();
+
+            console.log("Goal: " + goalData.configurations.dailyTarget);
+
+            if (goalResponse.ok && goalData) {
+                // User has job configuration
+                STANDARD_WORK_HOURS = { 
+                    Mon: goalData.configurations.dailyTarget,
+                    Tue: goalData.configurations.dailyTarget,
+                    Wed: goalData.configurations.dailyTarget,
+                    Thu: goalData.configurations.dailyTarget,
+                    Fri: goalData.configurations.dailyTarget,
+                    Sat: goalData.configurations.dailyTarget,
+                    Sun: goalData.configurations.dailyTarget
+                };
+                return { type: 'goal', data: goalData };
+            }
+
+            // User has no configuration
+            return null;
+        } catch (error) {
+            console.error("Error fetching user configuration:", error);
+            return null;
+        }
+    }
+
+    // Show modal if user has no configuration
+    async function checkUserConfiguration() {
+        const config = await fetchUserConfiguration();
+        if (!config) {
+            userInputModal.show(); 
+        } else {
+            console.log("User configuration found:", config);
+        }
+    }
 
     // Event listeners for initial buttons
     document.getElementById('forJobBtn').addEventListener('click', () => {
@@ -151,6 +228,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             Swal.fire("Success", data.message, "success");
             userInputModal.hide(); 
+            await fetchUserConfiguration();
+            // console.log("STANDARD_WORK_HOURS(job) set:", STANDARD_WORK_HOURS);
         } catch (error) {
             Swal.fire("Error", "Failed to save job details. Please try again.", "error");
             console.error(error);
@@ -183,28 +262,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             Swal.fire("Success", data.message, "success");
             userInputModal.hide(); 
+            await fetchUserConfiguration();
+            // console.log("STANDARD_WORK_HOURS(goal) set:", STANDARD_WORK_HOURS);
         } catch (error) {
             Swal.fire("Error", "Failed to save goal details. Please try again.", "error");
             console.error(error);
         }
     });
-
-    // Fetch user profile 
-    async function fetchUserProfile() {
-        try {
-            let response = await fetch('/api/v1/user/');
-            let user = await response.json();
-            if (response.status == 200) {
-                userNameEl.textContent = user.name;
-                userPhotoEl.src = user.photo || "../logo/image.png";
-                userPhotoEl.style.display = "block";
-                userId = user.id;
-                userName = user.name;
-            }
-        } catch (error) {
-            console.error("User not logged in:", error);
-        }
-    }
 
     // Fetch saved timesheets 
     async function fetchSavedTimesheets() {
@@ -653,5 +717,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     await fetchUserProfile();
+    await checkUserConfiguration();
+    // console.log("STANDARD_WORK_HOURS set:", STANDARD_WORK_HOURS);
     await fetchSavedTimesheets();
 });
