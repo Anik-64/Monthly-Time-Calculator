@@ -4,6 +4,7 @@ const session = require("express-session");
 const passport = require("passport");
 const cors = require('cors');
 const timeSaveRouter = require('./server/timeKeeper');
+const userConfigurationRouter = require('./server/userConfiguration');
 const isAuthenticated = require('./auth/isAuthenticated');
 
 const app = express();
@@ -80,6 +81,7 @@ app.get('/api/v1/user', (req, res) => {
 });
 
 app.use("/api/v1/timesheet", isAuthenticated, timeSaveRouter);
+app.use("/api/v1/configuration", isAuthenticated, userConfigurationRouter);
 
 // Start the server
 app.listen(process.env.PORT, () => {
