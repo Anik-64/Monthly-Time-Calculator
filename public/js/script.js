@@ -10,6 +10,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userNameEl = document.getElementById("userName");
     const userPhotoEl = document.getElementById("userPhoto");
     const logoutBtn = document.getElementById("logoutBtn");
+
+    const salaryInput = document.getElementById("salaryInput");
+    const dailyGoalInput = document.getElementById("dailyTargetInput");
+
     let userId = '';
     let userName = '';
 
@@ -89,6 +93,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
+    // Add blur event listener to work hour inputs
     document.querySelectorAll('.work-hour').forEach(input => {
         input.addEventListener('blur', () => {
             validateHours(input);
@@ -96,35 +101,56 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Add blur event listener to salary input
-    const salaryInput = document.getElementById('salaryInput');
     salaryInput.addEventListener('blur', () => {
         validateSalary(salaryInput);
     });
-
+    
+    // Add blur event listener to daily goal input
+    dailyGoalInput.addEventListener('blur', () => {
+        validateHours(dailyGoalInput);
+    });
 
     // Submit job form
     document.getElementById('submitJobBtn').addEventListener('click', async () => {
-        const workHours = Array.from(document.querySelectorAll('.work-hour')).map(input => input.value);
-        const salary = document.getElementById('salaryInput').value;
+        const workHours = Array.from(document.querySelectorAll('.work-hour')).map(input => {
+            const value = input.value.trim();
+            return value === "" ? 0 : parseFloat(value); // Default to 0 if empty
+        });
+
+        const salary = document.getElementById('salaryInput').value.trim();
         const currency = document.getElementById('currencySelect').value;
 
-        // Validate inputs
-        if (workHours.some(hour => isNaN(hour) || isNaN(salary))) {
-            Swal.fire("Error", "Please enter valid numbers for work hours and salary.", "error");
-            return;
-        }
+        const jobData = {
+            userId, 
+            workHours: {
+                Mon: workHours[0],
+                Tue: workHours[1],
+                Wed: workHours[2],
+                Thu: workHours[3],
+                Fri: workHours[4],
+                Sat: workHours[5],
+                Sun: workHours[6]
+            },
+            salary: parseFloat(salary),
+            currency
+        };
 
-        // Call API to save job details
         try {
-            const response = await fetch('/api/v1/user/job', {
+            const response = await fetch('/api/v1/configuration/job', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, workHours, salary, currency })
+                body: JSON.stringify(jobData)
             });
 
-            if (!response.ok) throw new Error('Failed to save job details');
-            Swal.fire("Success", "Job details saved successfully!", "success");
-            userInputModal.hide();
+            const data = await response.json();
+
+            if (response.error) {
+                Swal.fire("Error", data.message, "error");
+                return;
+            }
+
+            Swal.fire("Success", data.message, "success");
+            userInputModal.hide(); 
         } catch (error) {
             Swal.fire("Error", "Failed to save job details. Please try again.", "error");
             console.error(error);
@@ -134,24 +160,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Submit goal form
     document.getElementById('submitGoalBtn').addEventListener('click', async () => {
         const dailyTarget = document.getElementById('dailyTargetInput').value;
+        const comment = document.getElementById("comment").value.trim();
 
-        // Validate input
         if (isNaN(dailyTarget)) {
             Swal.fire("Error", "Please enter a valid number for daily target hours.", "error");
             return;
         }
 
-        // Call API to save goal details
         try {
-            const response = await fetch('/api/v1/user/goal', {
+            const response = await fetch('/api/v1/configuration/goal', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, dailyTarget })
+                body: JSON.stringify({ userId, dailyTarget, comment })
             });
 
-            if (!response.ok) throw new Error('Failed to save goal details');
-            Swal.fire("Success", "Goal details saved successfully!", "success");
-            userInputModal.hide();
+            const data = await response.json();
+
+            if (response.error) {
+                Swal.fire("Error", data.message, "error");
+                return;
+            }
+
+            Swal.fire("Success", data.message, "success");
+            userInputModal.hide(); 
         } catch (error) {
             Swal.fire("Error", "Failed to save goal details. Please try again.", "error");
             console.error(error);
