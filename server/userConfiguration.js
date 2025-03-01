@@ -6,7 +6,39 @@ const userConfigurationRouter = express.Router();
 const db = admin.firestore();
 
 // Get specific user specific configuration data
+userConfigurationRouter.get('/:userId/:type', async (req, res) => {
+    try {
+        const { userId, type } = req.params;
 
+        if (type !== 'job' && type !== 'goal') {
+            return res.status(400).json({ 
+                error: true,
+                message: "Invalid configuration type."
+            });
+        }
+
+        const userRef = db.collection('timesheets').doc(userId);
+        const configRef = userRef.collection('configuration').doc(type);
+        const doc = await configRef.get();
+
+        let data = doc.data();
+
+        if (!data) {
+            return res.status(404).json({ 
+                error: true,
+                message: 'Configurations not found.' 
+            });
+        }
+
+        res.status(200).json({
+            error: false,
+            configurations: data,
+        });
+    } catch (error) {
+        console.error("Error fetching job configuration:", error);
+        res.status(500).json({ error: "Failed to fetch job configuration." });
+    }
+});
 
 
 // Save user configuration job data
