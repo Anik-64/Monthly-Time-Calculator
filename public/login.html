@@ -37,7 +37,7 @@
 </head>
 <body class="bg-gray-100">
     <!-- Navbar -->
-    <nav class="bg-white shadow-lg fixed w-full top-0 z-10">
+    <!-- <nav class="bg-white shadow-lg fixed w-full top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -53,8 +53,43 @@
                 </div>
             </div>
         </div>
-    </nav>
+    </nav> -->
 
+    <!-- Replace the existing nav section with this -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="logo-container">
+                        <img class="w-12 h-12 object-contain" src="./logo/timeSave.png" alt="TimeCalc Logo" loading="lazy">
+                        <span class="text-2xl font-bold text-indigo-600">TimeCalc</span>
+                    </div>
+                </div>
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#features" class="text-gray-600 hover:text-indigo-600 px-3 py-2 transition duration-300">Features</a>
+                    <a href="#how-it-works" class="text-gray-600 hover:text-indigo-600 px-3 py-2 transition duration-300">How It Works</a>
+                    <a href="#signup" id="signup-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition duration-300">Sign Up</a>
+                </div>
+                <!-- Hamburger Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-indigo-600 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
+                <a href="#features" class="block text-gray-600 hover:text-indigo-600 px-3 py-2 transition duration-300">Features</a>
+                <a href="#how-it-works" class="block text-gray-600 hover:text-indigo-600 px-3 py-2 transition duration-300">How It Works</a>
+                <a href="#signup" id="mobile-signup-btn" class="block bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-700 transition duration-300">Sign Up</a>
+            </div>
+        </div>
+    </nav>
     <!-- Hero Section -->
     <section class="bg-indigo-600 text-white pt-32 pb-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -207,10 +242,15 @@
         const modal = document.getElementById('signup-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
 
+        // Mobile menu functionality
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
         signupBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 modal.style.display = 'flex';
+                mobileMenu.classList.add('hidden');
             });
         });
 
@@ -221,6 +261,18 @@
         window.addEventListener('click', (e) => {
             if (e.target === modal) {
                 modal.style.display = 'none';
+            }
+        });
+
+        // Toggle mobile menu
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
             }
         });
     </script>
