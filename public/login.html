@@ -37,25 +37,6 @@
 </head>
 <body class="bg-gray-100">
     <!-- Navbar -->
-    <!-- <nav class="bg-white shadow-lg fixed w-full top-0 z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="logo-container">
-                        <img class="w-12 h-12 object-contain" src="./logo/timeSave.png" alt="TimeCalc Logo" loading="lazy">
-                        <span class="text-2xl font-bold text-indigo-600">TimeCalc</span>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="#features" class="text-gray-600 hover:text-indigo-600 px-3 py-2 transition duration-300">Features</a>
-                    <a href="#how-it-works" class="text-gray-600 hover:text-indigo-600 px-3 py-2 transition duration-300">How It Works</a>
-                    <a href="#signup" id="signup-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition duration-300">Sign Up</a>
-                </div>
-            </div>
-        </div>
-    </nav> -->
-
-    <!-- Replace the existing nav section with this -->
     <nav class="bg-white shadow-lg fixed w-full top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -187,6 +168,11 @@
             <p>© 2025 TimeCalc. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Scroll-to-top button -->
+    <button id="scrollToTopBtn" title="Go to top">
+        <img src="./logo/fireClock.png" alt="Scroll-to-top">
+    </button>
     
     <!-- Modal -->
     <div id="signup-modal" class="modal">
@@ -274,6 +260,22 @@
             if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
                 mobileMenu.classList.add('hidden');
             }
+        });
+
+        // Scroll-to-top button functionality
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                scrollToTopBtn.style.display = 'block';
+            } else {
+                scrollToTopBtn.style.display = 'none';
+            }
+        };
+
+        scrollToTopBtn.addEventListener('click', function() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
         });
     </script>
 </body>
