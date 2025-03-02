@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const salaryInput = document.getElementById("salaryInput");
     const dailyGoalInput = document.getElementById("dailyTargetInput");
 
+    const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+
     let userId = '';
     let userName = '';
 
@@ -789,6 +791,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (error) {
             console.error("Logout error:", error);
         }
+    });
+
+    window.onscroll = function() {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            scrollToTopBtn.style.display = "block";
+        } else {
+            scrollToTopBtn.style.display = "none";
+        }
+    };
+
+    scrollToTopBtn.addEventListener("click", function() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0; 
     });
 
     await fetchUserProfile();
