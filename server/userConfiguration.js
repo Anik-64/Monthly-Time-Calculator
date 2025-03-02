@@ -108,4 +108,67 @@ userConfigurationRouter.post('/goal', async (req, res) => {
     }
 });
 
+// Update user configuration job data
+userConfigurationRouter.put('/:userId/job', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { workHours, salary, currency } = req.body;
+
+        if (!workHours || !salary || !currency) {
+            return res.status(400).json({ 
+                error: true,
+                message: "Missing required fields."
+            });
+        }
+
+        const userRef = db.collection('timesheets').doc(userId);
+        const configRef = userRef.collection('configuration').doc('job');
+        await configRef.update({
+            workHours,
+            salary,
+            currency,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        res.status(200).json({ 
+            error: false, 
+            message: "Job configuration updated successfully!" 
+        });
+    } catch (error) {
+        console.error("Error updating job configuration:", error);
+        res.status(500).json({ error: "Failed to update job configuration." });
+    }
+});
+
+// Update user configuration goal data
+userConfigurationRouter.put('/:userId/goal', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { dailyTarget, comment } = req.body;
+
+        if (!dailyTarget) {
+            return res.status(400).json({ 
+                error: true,
+                message: "Missing required fields."
+            });
+        }
+
+        const userRef = db.collection('timesheets').doc(userId);
+        const configRef = userRef.collection('configuration').doc('goal');
+        await configRef.update({
+            dailyTarget,
+            comment,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        res.status(200).json({ 
+            error: false, 
+            message: "Goal configuration updated successfully!" 
+        });
+    } catch (error) {
+        console.error("Error updating goal configuration:", error);
+        res.status(500).json({ error: "Failed to update goal configuration." });
+    }
+});
+
 module.exports = userConfigurationRouter;
