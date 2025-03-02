@@ -12,9 +12,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const logoutBtn = document.getElementById("logoutBtn");
 
     const salaryInput = document.getElementById("salaryInput");
+    const updateSalary = document.getElementById("jobSalaryInput");
     const dailyGoalInput = document.getElementById("dailyTargetInput");
 
     const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+
+    const updateModal = new bootstrap.Modal(document.getElementById('userConfigModal'));
 
     let userId = '';
     let userName = '';
@@ -134,6 +137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const motivationEl = document.getElementById('motivation');
         const motivationSection = document.querySelector(".motivation");
         const salarySection = document.querySelector(".salary");
+        const updatedTimeEl = document.getElementById("UpdatedTime");
 
         // Reset UI
         configTypeEl.textContent = 'N/A';
@@ -141,6 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         configSalaryEl.textContent = 'N/A';
         configCurrencyEl.textContent = 'N/A';
         motivationEl.textContent = 'N/A';
+        updatedTimeEl.textContent = "";
 
         motivationSection.classList.remove("hidden");
         salarySection.classList.remove("hidden");
@@ -178,6 +183,149 @@ document.addEventListener("DOMContentLoaded", async () => {
             workHoursListEl.innerHTML = '<li>Failed to fetch configuration.</li>';
             configSalaryEl.textContent = 'N/A';
             configCurrencyEl.textContent = 'N/A';
+        }
+
+        // Show last updated time if createdAt and updatedAt are different
+        if (configurations.createdAt && configurations.updatedAt) {
+            const createdAt = new Date(configurations.createdAt._seconds * 1000);
+            const updatedAt = new Date(configurations.updatedAt._seconds * 1000);
+
+            if (createdAt.getTime() !== updatedAt.getTime()) {
+                const formattedTime = updatedAt.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                });
+                updatedTimeEl.textContent = `(Updated: ${formattedTime})`;
+            }
+        }
+    }
+
+    // Event listener for user photo click
+    document.getElementById('userPhoto').addEventListener('click', async () => {
+        const config = await fetchUserConfiguration();
+        if (config) {
+            updateModal.show();
+
+            populateUserConfigModal(config);
+        } else {
+            alert('No configuration found for this user.');
+        }
+    });
+
+    // Function to populate the new modal with configuration data
+    function populateUserConfigModal(config) {
+        const { type, data } = config;
+
+        document.getElementById('jobConfigForm').classList.add('d-none');
+        document.getElementById('goalConfigForm').classList.add('d-none');
+        document.getElementById('noConfigContent').classList.add('d-none');
+
+        if (type === 'job') {
+            document.getElementById('jobConfigForm').classList.remove('d-none');
+
+            const workHours = data.configurations.workHours;
+            const workHourInputs = document.querySelectorAll('#jobConfigForm .work-hour');
+            workHourInputs.forEach(input => {
+                const day = input.getAttribute('data-day');
+                input.value = workHours[day];
+            });
+
+            document.getElementById('jobSalaryInput').value = data.configurations.salary;
+            document.getElementById('jobCurrencySelect').value = data.configurations.currency;
+
+            document.getElementById('jobConfigForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                updateJobConfiguration();
+            });
+        } else if (type === 'goal') {
+            document.getElementById('goalConfigForm').classList.remove('d-none');
+
+            document.getElementById('goalDailyTargetInput').value = data.configurations.dailyTarget;
+            document.getElementById('goalCommentTextarea').value = data.configurations.comment;
+
+            document.getElementById('goalConfigForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                updateGoalConfiguration();
+            });
+        } else {
+            document.getElementById('noConfigContent').classList.remove('d-none');
+        }
+    }
+
+    // Function to update job configuration
+    async function updateJobConfiguration() {
+        const workHours = {};
+        document.querySelectorAll('#jobConfigForm .work-hour').forEach(input => {
+            const day = input.getAttribute('data-day');
+            workHours[day] = input.value;
+        });
+
+        const salary = document.getElementById('jobSalaryInput').value;
+        const currency = document.getElementById('jobCurrencySelect').value;
+
+        const updatedConfig = {
+            workHours,
+            salary,
+            currency,
+        };
+
+        // Call API to update job configuration
+        try {
+            const response = await fetch(`/api/v1/configuration/${userId}/job`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedConfig),
+            });
+
+            let result = await response.json();
+
+            if (result.error) {
+                alert(result.message);
+            } else {
+                updateModal.hide();
+                await checkUserConfiguration();
+                alert('Updated job configuration.' + result.message);
+            }
+        } catch (error) {
+            console.error('Error updating job configuration:', error);
+            alert('An error occurred while updating job configuration.');
+        }
+    }
+
+    // Function to update goal configuration
+    async function updateGoalConfiguration() {
+        const dailyTarget = document.getElementById('goalDailyTargetInput').value;
+        const comment = document.getElementById('goalCommentTextarea').value;
+
+        const updatedConfig = {
+            dailyTarget,
+            comment,
+        };
+
+        // Call API to update goal configuration
+        try {
+            const response = await fetch(`/api/v1/configuration/${userId}/goal`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedConfig),
+            });
+
+            let result = await response.json();
+
+            if (result.error) {
+                alert(result.message);
+            } else {
+                updateModal.hide();
+                await checkUserConfiguration();
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error('Error updating goal configuration:', error);
+            alert('An error occurred while updating goal configuration.');
         }
     }
 
@@ -257,6 +405,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Add blur event listener to salary input
     salaryInput.addEventListener('blur', () => {
         validateSalary(salaryInput);
+    });
+
+    updateSalary.addEventListener('blur', () => {
+        validateSalary(updateSalary);
     });
     
     // Add blur event listener to daily goal input

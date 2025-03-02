@@ -18,7 +18,7 @@
         <div id="userProfile" class="d-flex align-items-center">
             <img id="userPhoto" src="" alt="User" class="rounded-circle me-2" width="40" height="40" style="display: none;">
             <span id="userName" class="me-3"></span>
-            <button id="logoutBtn" class="btn btn-danger btn-sm">Logout</button>
+            <img id="logoutBtn" class="logout-img" src="./logo/logout.png" alt="Logout">
         </div>
     </header>
 
@@ -68,7 +68,15 @@
                 </div>
                 <div class="col-md-6">
                     <div class="config-card h-100 p-3 bg-gradient-indigo rounded">
-                        <h6 class="text-dark mb-2">⚙️ Configuration</h6>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <h6 class="text-dark mb-2">⚙️ Configuration</h6>
+                            </div>
+                            <div class="col-md-7">
+                                <span id="UpdatedTime" class="text-muted small"></span>
+                            </div>
+                        </div>
+                        <!-- <h6 class="text-dark mb-2">⚙️ Configuration <span id="UpdatedTime" class="text-muted small"></span></h6> -->
                         <div class="config-item mb-2">
                             <span class="fw-medium">Type:</span>
                             <span id="configType">N/A</span>
@@ -198,6 +206,102 @@
                         <button id="goBackBtnGoal" class="btn btn-secondary">Go back</button>
                         <button id="submitGoalBtn" class="btn btn-primary">Submit</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for User Configuration -->
+<div id="userConfigModal" class="modal fade" tabindex="-1" aria-labelledby="userConfigModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userConfigModalLabel">Your Configuration</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Job Configuration Form -->
+                <form id="jobConfigForm" class="d-none">
+                    <div class="row mb-3">
+                        <div class="col">Mon</div>
+                        <div class="col">Tue</div>
+                        <div class="col">Wed</div>
+                        <div class="col">Thu</div>
+                        <div class="col">Fri</div>
+                        <div class="col">Sat</div>
+                        <div class="col">Sun</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒" data-day="Mon">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒" data-day="Tue">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒" data-day="Wed">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒" data-day="Thu">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒" data-day="Fri">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒" data-day="Sat">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control work-hour" placeholder="🕒" data-day="Sun">
+                            <small class="invalid-feedback">Hours must be a whole number between 0 and 24.</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="jobSalaryInput" class="form-label">Salary</label>
+                            <input type="text" id="jobSalaryInput" class="form-control" placeholder="Enter your salary">
+                            <small class="invalid-feedback">Salary must be a positive number.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="jobCurrencySelect" class="form-label">Currency</label>
+                            <select id="jobCurrencySelect" class="form-select">
+                                <option value="BDT (৳‎)">BDT (৳‎)</option>
+                                <option value="INR (₹‎‎)">INR (₹‎)</option>
+                                <option value="USD ($)">USD ($)</option>
+                                <option value="EUR (€‎)">EUR (€‎)</option>
+                                <option value="GBP (£‎)">GBP (£‎)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+
+                <!-- Goal Configuration Form -->
+                <form id="goalConfigForm" class="d-none">
+                    <div class="mb-3">
+                        <label for="goalDailyTargetInput" class="form-label">Daily Target Hours</label>
+                        <input type="number" id="goalDailyTargetInput" class="form-control" placeholder="Enter daily target hours">
+                    </div>
+                    <div class="mb-3">
+                        <label for="goalCommentTextarea" class="form-label">Motivation</label>
+                        <textarea id="goalCommentTextarea" class="form-control" placeholder="Describe your goal here" rows="3"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+
+                <!-- No Configuration Message -->
+                <div id="noConfigContent" class="d-none">
+                    <p class="text-muted">No configuration found.</p>
                 </div>
             </div>
         </div>
