@@ -155,3 +155,18 @@ p {
 #summaryContent.blurred {
     filter: blur(100px);
 }
+
+#scrollToTopBtn {
+    display: none; 
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 0;     
+    border: none;
+    background: none; 
+}
+#scrollToTopBtn img {
+    width: 54px; 
+    height: 54px; 
+}
