@@ -14,7 +14,25 @@ const isAuthenticated = require('./auth/isAuthenticated');
 const app = express();
 require('./auth/auth');
 
-app.use(cors());
+const corsOptions = {
+    // origin: (origin, callback) => {
+    //   const allowedOrigins = [
+    //     "https://localhost:8081",
+    //   ];
+    //   if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    //     callback(null, true);
+    //   } else {
+    //     callback(new Error("Not allowed by CORS"));
+    //   }
+    // },
+
+    origin: '*',
+    // origin: 'http://localhost:3000',
+    credentials: true, // If you need to handle cookies or authentication tokens
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    // allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+app.use(cors(corsOptions));
 app.use(
     helmet({
         contentSecurityPolicy: {
@@ -41,6 +59,7 @@ app.use(
                 connectSrc: [
                     "'self'", // Allow API requests to the same origin
                     "https://monthly-time-calculator.onrender.com", // Your app's domain
+                    "http://localhost:3000",
                 ],
                 frameSrc: [
                     "'self'", // Allow iframes from the same origin
@@ -63,6 +82,8 @@ app.use(
         secret: process.env.SECRET_SESSION_KEY,
         resave: false,
         saveUninitialized: true,
+        // cookie: { secure: false }, // Set to `false` for HTTP // set to `true` for HTTPS
+        cookie: { secure: true },
     })
 );
 app.use(passport.initialize());
@@ -112,12 +133,18 @@ app.get('/auth/failure', (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
+    console.log("Logout route called");
     req.logOut(err => {
         if (err) {
-            return next(err);
+            console.error("Logout error:", err);
+            // return next(err);
+            return res.status(500).send("Logout failed");
         }
         req.session.destroy(() => {
+            console.log("Session destroyed");
             res.redirect('/'); 
+            // res.redirect("http://localhost:3000/"); 
+            console.log("Redirect sent to /");
         });
     });
 });
