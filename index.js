@@ -59,6 +59,8 @@ app.use(
                 connectSrc: [
                     "'self'", // Allow API requests to the same origin
                     "https://monthly-time-calculator.onrender.com", // Your app's domain
+                    "https://accounts.google.com",
+                    "https://oauth2.googleapis.com",
                     "http://localhost:3000",
                 ],
                 frameSrc: [
