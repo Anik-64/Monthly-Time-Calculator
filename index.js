@@ -15,24 +15,16 @@ const app = express();
 require('./auth/auth');
 
 const corsOptions = {
-    // origin: (origin, callback) => {
-    //   const allowedOrigins = [
-    //     "https://localhost:8081",
-    //   ];
-    //   if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-    //     callback(null, true);
-    //   } else {
-    //     callback(new Error("Not allowed by CORS"));
-    //   }
-    // },
-
     origin: '*',
-    // origin: 'http://localhost:3000',
     credentials: true, // If you need to handle cookies or authentication tokens
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     // allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 app.use(cors(corsOptions));
+
+app.use(express.json());
+app.use(express.static("public"));
+
 app.use(
     helmet({
         contentSecurityPolicy: {
@@ -75,8 +67,6 @@ app.use(
         },
     })
 );
-app.use(express.json());
-app.use(express.static('public'));
 
 // Session setup
 app.use(
@@ -85,7 +75,7 @@ app.use(
         resave: false,
         saveUninitialized: true,
         // cookie: { secure: false }, // Set to `false` for HTTP // set to `true` for HTTPS
-        cookie: { secure: true },
+        // cookie: { secure: true },
     })
 );
 app.use(passport.initialize());
@@ -139,17 +129,39 @@ app.get('/logout', (req, res) => {
     req.logOut(err => {
         if (err) {
             console.error("Logout error:", err);
-            // return next(err);
             return res.status(500).send("Logout failed");
         }
         req.session.destroy(() => {
             console.log("Session destroyed");
             res.redirect('/'); 
-            // res.redirect("http://localhost:3000/"); 
             console.log("Redirect sent to /");
         });
     });
 });
+
+// app.get('/logout', (req, res, next) => {
+//     console.log("Logout route called");
+
+//     req.logout(err => {
+//         if (err) {
+//             console.error("Logout error:", err);
+//             return res.status(500).send("Logout failed");
+//         }
+
+//         req.session.destroy(err => {
+//             if (err) {
+//                 console.error("Session destruction error:", err);
+//                 return res.status(500).send("Could not destroy session");
+//             }
+//             console.log("Session destroyed");
+//             res.clearCookie('connect.sid'); // Ensure session cookie is removed
+//             res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate'); // Prevent caching
+//             res.redirect('/');
+//             console.log("Redirect sent to /");
+//         });
+//     });
+// });
+
 
 app.get('/api/v1/user', (req, res) => {
     if (req.isAuthenticated()) {
