@@ -36,6 +36,8 @@ app.use(
                     "https://unpkg.com/aos@2.3.1/dist/aos.js", // AOS library
                     "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js", // Bootstrap JS
                     "https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.all.min.js", // SweetAlert2
+                    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+                    "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.3/jspdf.plugin.autotable.min.js",
                     "'unsafe-inline'", // Allow inline scripts (if necessary)
                 ],
                 fontSrc: [
