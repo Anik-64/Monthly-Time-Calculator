@@ -52,7 +52,7 @@ app.use(
                 ],
                 connectSrc: [
                     "'self'", // Allow API requests to the same origin
-                    "https://monthly-time-calculator.onrender.com", // Your app's domain
+                    "https://monthly-time-calculator.onrender.com", 
                     "https://accounts.google.com",
                     "https://oauth2.googleapis.com",
                     "http://localhost:3000",
@@ -76,8 +76,6 @@ app.use(
         secret: process.env.SECRET_SESSION_KEY,
         resave: false,
         saveUninitialized: true,
-        // cookie: { secure: false }, // Set to `false` for HTTP // set to `true` for HTTPS
-        // cookie: { secure: true },
     })
 );
 app.use(passport.initialize());
