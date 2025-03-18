@@ -490,6 +490,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Fetch saved timesheets 
+    let originalTimesheetContent = "";
     async function fetchSavedTimesheets() {
         if (!userId) return;
         try {
@@ -507,7 +508,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (totalSalary != 0) {
                 timesheetContainer.innerHTML = `
-                    <div class="row mb-3">
+                    <div class="row mb-2 mt-2">
                         <div class="col-12">
                             <div class="alert alert-info text-center">
                                 Total Salary Across All Months: <strong>${totalSalary} ${currency}</strong>
@@ -533,7 +534,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             <p class="text-success">Additional: <strong>${data.additionalTime}</strong></p>
                             <p class="text-danger">Deficient: <strong>${data.deficientTime}</strong></p>
                             ${expectedHours != 0 ? `<p class="text-muted">Expected Hours: <strong>${expectedHours}h</strong></p>` : ``}
-                            <button class="btn btn-primary view-details" data-month="${month}">View Details</button>
+                            <button class="btn btn-sm btn-info view-details mt-2" data-month="${month}">View Details</button>
                         </div>
                     </div>
                     <div class="table-container d-none" id="table-${month}"></div>
@@ -547,9 +548,125 @@ document.addEventListener("DOMContentLoaded", async () => {
                     toggleTableView(month, timesheetArray.find(item => item.month === month).data.entries);
                 });
             });
+
+            if (totalSalary != 0) {
+                if (!document.getElementById('generateReportBtn')) {
+                    const reportBtn = document.createElement('button');
+                    reportBtn.id = 'generateReportBtn';
+                    reportBtn.className = 'btn btn-secondary mt-3 w-100';
+                    reportBtn.textContent = 'Generate Report';
+                    const btnContainer = document.createElement("div");
+                    btnContainer.className = "col-12 text-center";
+                    btnContainer.appendChild(reportBtn);
+                    timesheetContainer.appendChild(btnContainer);
+                }
+
+                originalTimesheetContent = timesheetContainer.innerHTML;
+
+                document.querySelectorAll(".view-details").forEach(button => {
+                    button.addEventListener("click", (event) => {
+                        let month = event.target.getAttribute("data-month");
+                        toggleTableView(month, timesheetArray.find(item => item.month === month).data.entries);
+                    });
+                });
+
+                document.getElementById('generateReportBtn').addEventListener('click', () => {
+                    generateReport(timesheetArray, totalSalary, currency);
+                });
+            }
         } catch (error) {
             console.error("Error fetching timesheets:", error);
         }
+    }
+
+    function generateReport(timesheetArray, totalSalary, currency) {
+        // Create report container
+        const reportContainer = document.createElement('div');
+        reportContainer.className = 'report-container mt-4';
+
+        // Report header
+        reportContainer.innerHTML = `
+            <h3>Timesheet Report</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Month</th>
+                            <th>Total Time</th>
+                            <th>Expected Hours</th>
+                            <th>Hourly Salary (${currency})</th>
+                            <th>Additional Time</th>
+                            <th>Deficient Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${timesheetArray.map(({ month, data }) => `
+                            <tr>
+                                <td>${month}</td>
+                                <td>${data.totalTime}</td>
+                                <td>${data.expectedMonthlyHours || 0}h</td>
+                                <td>${data.monthlyHourlySalary || "0.00"}</td>
+                                <td>${data.additionalTime}</td>
+                                <td>${data.deficientTime}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3"><strong>Total Salary</strong></td>
+                            <td colspan="3"><strong>${totalSalary} (${currency})</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="mt-2">
+                <button id="backBtn" class="btn btn-secondary me-2">Back to Timesheets</button>
+                <button id="exportPdfBtn" class="btn btn-primary">Export as PDF</button>
+            </div>
+        `;
+
+        // Replace existing content or append to timesheetContainer
+        timesheetContainer.innerHTML = '';
+        timesheetContainer.appendChild(reportContainer);
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            timesheetContainer.innerHTML = originalTimesheetContent;
+            // Re-attach event listeners after restoring content
+            document.querySelectorAll(".view-details").forEach(button => {
+                button.addEventListener("click", (event) => {
+                    let month = event.target.getAttribute("data-month");
+                    toggleTableView(month, timesheetArray.find(item => item.month === month).data.entries);
+                });
+            });
+            document.getElementById('generateReportBtn').addEventListener('click', () => {
+                generateReport(timesheetArray, totalSalary, currency);
+            });
+        });
+
+        // Add PDF export functionality (requires jsPDF library)
+        document.getElementById('exportPdfBtn').addEventListener('click', () => {
+            if (typeof jspdf !== 'undefined' && jspdf.jsPDF) {
+                const { jsPDF } = jspdf; 
+                const doc = new jsPDF();
+                doc.text('Timesheet Report', 10, 10);
+                doc.autoTable({
+                    startY: 20,
+                    head: [['Month', 'Total Time', 'Expected Hours', `Hourly Salary (${currency})`, 'Additional Time', 'Deficient Time']],
+                    body: timesheetArray.map(({ month, data }) => [
+                        month,
+                        data.totalTime,
+                        `${data.expectedMonthlyHours || 0}h`,
+                        data.monthlyHourlySalary || "0.00",
+                        data.additionalTime,
+                        data.deficientTime
+                    ]),
+                    foot: [['Total Salary', '', '', `${totalSalary} ${currency}`, '', '']],
+                });
+                doc.save(`Timesheet_Report_${userId}_${new Date().toISOString().split('T')[0]}.pdf`);
+            } else {
+                Swal.fire("Error", "jsPDF library is not loaded correctly. Please ensure the CDN is included and loaded.", "error");
+            }
+        });
     }
 
     // Toggle table view 
@@ -967,6 +1084,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0; 
     });
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
 
     await fetchUserProfile();
     await checkUserConfiguration();
