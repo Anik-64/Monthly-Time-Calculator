@@ -181,3 +181,28 @@ p {
 #userPhoto {
     cursor: pointer;
 }
+
+#savedTimesheets {
+    overflow: hidden; 
+}
+
+#timesheetContainer {
+    padding: 0 15px; 
+}
+
+#generateReportBtn {
+    max-width: 200px; 
+    margin-left: auto;
+    margin-right: auto;
+    display: block; 
+}
+
+.clickable {
+    cursor: pointer; 
+    transition: transform 0.2s ease, opacity 0.2s ease; 
+}
+
+.clickable:hover {
+    transform: scale(1.1);
+    opacity: 0.8; 
+}
