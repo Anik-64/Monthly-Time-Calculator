@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     let userId = '';
     let userName = '';
 
-    // const STANDARD_WORK_HOURS = { "Mon": 8, "Tue": 8, "Wed": 8, "Thu": 4, "Sat": 8, "Sun": 8 };
     let STANDARD_WORK_HOURS = {};
 
     const userInputModal = new bootstrap.Modal(document.getElementById('userInputModal'), {
@@ -69,7 +68,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             let type = 'job';
             const jobResponse = await fetch(`/api/v1/configuration/${userId}/${type}`);
             const jobData = await jobResponse.json();
-            // console.log("Job: " + jobData.configurations);
 
             if (jobResponse.ok && jobData) {
                 STANDARD_WORK_HOURS = { 
@@ -86,12 +84,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return { type: 'job', data: jobData };
             }
 
-            // Fetch job configuration
             type = 'goal';
             const goalResponse = await fetch(`/api/v1/configuration/${userId}/${type}`);
             const goalData = await goalResponse.json();
-
-            // console.log("Goal: " + goalData.configurations.dailyTarget);
 
             if (goalResponse.ok && goalData) {
                 STANDARD_WORK_HOURS = { 
@@ -108,7 +103,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 return { type: 'goal', data: goalData };
             }
 
-            // User has no configuration
             updateConfigurationUI("none", {});
             hideShimmer();
             return null;
@@ -139,7 +133,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const salarySection = document.querySelector(".salary");
         const updatedTimeEl = document.getElementById("UpdatedTime");
 
-        // Reset UI
         configTypeEl.textContent = 'N/A';
         workHoursListEl.innerHTML = '<li>No work hours configured.</li>';
         configSalaryEl.textContent = 'N/A';
@@ -170,8 +163,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <li>Daily Target-> <strong>${configurations.dailyTarget} hours</strong></li>
             `;
             motivationEl.textContent = configurations.comment;
-
-            // Hide salary and currency sections for goal type
             salarySection.classList.add("hidden");
         } else if (type === 'none') {
             configTypeEl.textContent = 'No Configuration';
@@ -185,7 +176,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             configCurrencyEl.textContent = 'N/A';
         }
 
-        // Show last updated time if createdAt and updatedAt are different
         if (configurations.createdAt && configurations.updatedAt) {
             const createdAt = new Date(configurations.createdAt._seconds * 1000);
             const updatedAt = new Date(configurations.updatedAt._seconds * 1000);
@@ -420,7 +410,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('submitJobBtn').addEventListener('click', async () => {
         const workHours = Array.from(document.querySelectorAll('.work-hour')).map(input => {
             const value = input.value.trim();
-            return value === "" ? 0 : parseFloat(value); // Default to 0 if empty
+            return value === "" ? 0 : parseFloat(value); 
         });
 
         const salary = document.getElementById('salaryInput').value.trim();
@@ -512,17 +502,37 @@ document.addEventListener("DOMContentLoaded", async () => {
                 data: details
             }));
 
-            timesheetContainer.innerHTML = "";
+            let totalSalary = data.totalSalary; 
+            let currency = data.currency;
+
+            if (totalSalary != 0) {
+                timesheetContainer.innerHTML = `
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info text-center">
+                                Total Salary Across All Months: <strong>${totalSalary} ${currency}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             timesheetArray.forEach(({ month, data }) => {  
+                let monthlySalary = data.monthlyHourlySalary || "0.00"; 
+                let expectedHours = data.expectedMonthlyHours || 0; 
                 let card = document.createElement("div");
                 card.className = "col-md-4 mb-3";
                 card.innerHTML = `
                     <div class="card">
-                        <h5 class="card-header">${month}</h5>
+                        <h6 class="card-header">
+                            ${month}
+                            ${monthlySalary !== "0.00" ? `<span class="badge bg-success ms-2">${monthlySalary} ${currency}</span>` : ''}
+                        </h6>
                         <div class="card-body">
                             <p>Total: <strong>${data.totalTime}</strong></p>
                             <p class="text-success">Additional: <strong>${data.additionalTime}</strong></p>
                             <p class="text-danger">Deficient: <strong>${data.deficientTime}</strong></p>
+                            ${expectedHours != 0 ? `<p class="text-muted">Expected Hours: <strong>${expectedHours}h</strong></p>` : ``}
                             <button class="btn btn-primary view-details" data-month="${month}">View Details</button>
                         </div>
                     </div>
@@ -960,6 +970,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await fetchUserProfile();
     await checkUserConfiguration();
-    // console.log("STANDARD_WORK_HOURS set:", STANDARD_WORK_HOURS);
     await fetchSavedTimesheets();
 });
