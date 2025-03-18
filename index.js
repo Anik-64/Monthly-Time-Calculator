@@ -16,7 +16,7 @@ require('./auth/auth');
 
 const corsOptions = {
     origin: '*',
-    credentials: true, // If you need to handle cookies or authentication tokens
+    credentials: true, 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     // allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
@@ -138,30 +138,6 @@ app.get('/logout', (req, res) => {
         });
     });
 });
-
-// app.get('/logout', (req, res, next) => {
-//     console.log("Logout route called");
-
-//     req.logout(err => {
-//         if (err) {
-//             console.error("Logout error:", err);
-//             return res.status(500).send("Logout failed");
-//         }
-
-//         req.session.destroy(err => {
-//             if (err) {
-//                 console.error("Session destruction error:", err);
-//                 return res.status(500).send("Could not destroy session");
-//             }
-//             console.log("Session destroyed");
-//             res.clearCookie('connect.sid'); // Ensure session cookie is removed
-//             res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate'); // Prevent caching
-//             res.redirect('/');
-//             console.log("Redirect sent to /");
-//         });
-//     });
-// });
-
 
 app.get('/api/v1/user', (req, res) => {
     if (req.isAuthenticated()) {
