@@ -28,7 +28,6 @@ timeKeeperRouter.get('/:userId/:month', async (req, res) => {
             timesheet: timesheetData,
         });
 
-        // res.json({ userId, month, timesheet: timesheetData });
     } catch (error) {
         console.error("Error fetching timesheet:", error);
         return res.status(500).json({ message: "Internal Server Error", error });
@@ -63,51 +62,111 @@ timeKeeperRouter.post('/', async (req, res) => {
 timeKeeperRouter.get('/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
+
         let userDocRef = db.collection('timesheets').doc(userId);
         let monthsCollectionRef = userDocRef.collection('months');
+        let monthlySalaryRef = userDocRef.collection('configuration').doc('job');
 
-        // Fetch all months data
         let monthsSnapshot = await monthsCollectionRef.get();
+        let monthlySalarySnapshot = await monthlySalaryRef.get();
+
         if (monthsSnapshot.empty) {
             return res.status(404).json({ message: 'No timesheet data found for this user' });
         }
 
+        let salary = 0;
+        let currency = '';
+        let workHours = {};
+        let hasJobData = false;
+
+        if (!monthlySalarySnapshot.empty) {
+            let salaryData = monthlySalarySnapshot.data();
+            if (salaryData) {
+                salary = salaryData.salary || 0;
+                currency = salaryData.currency || '';
+                workHours = salaryData.workHours || {};
+                hasJobData = true;
+            }
+        }
+
         let timesheetData = [];
+        let totalSalary = 0;
 
         monthsSnapshot.forEach(doc => {
-            timesheetData.push({ id: doc.id, data: doc.data() });
+            let data = doc.data();
+            let totalTime = data.totalTime || "0h 0m";
+            console.log('Total time of month:', totalTime);
+
+            let hoursMatch = totalTime.match(/(\d+)h/);
+            let minutesMatch = totalTime.match(/(\d+)m/);
+            let hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
+            let minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+            let totalHours = hours + (minutes / 60);
+
+            let expectedMonthlyHours = 0;
+            let monthlyHourlySalary = "0.00";
+
+            if (hasJobData) {
+                const [monthName, year] = doc.id.split(' ');
+                const monthIndex = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ].indexOf(monthName);
+                const daysInMonth = new Date(parseInt(year), monthIndex + 1, 0).getDate();
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(parseInt(year), monthIndex, day);
+                    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                    const dailyHours = Number(workHours[dayName]) || 0;
+                    expectedMonthlyHours += dailyHours;
+                }
+
+                console.log('Expected monthly hours for', monthName, year, ':', expectedMonthlyHours);
+
+                let hourlyRate = expectedMonthlyHours > 0 ? salary / expectedMonthlyHours : 0;
+
+                monthlyHourlySalary = (totalHours * hourlyRate).toFixed(2);
+                totalSalary += Number(monthlyHourlySalary);
+            }
+
+            timesheetData.push({
+                id: doc.id,
+                data: {
+                    ...data,
+                    monthlyHourlySalary: monthlyHourlySalary,
+                    expectedMonthlyHours: hasJobData ? expectedMonthlyHours : 0
+                }
+            });
         });
 
-        // Helper function to convert month names to numbers
-        const monthNameToNumber = (monthName) => {
+        timesheetData.sort((a, b) => {
+            const [monthA, yearA] = a.id.split(' ');
+            const [monthB, yearB] = b.id.split(' ');
+            const yearANum = parseInt(yearA);
+            const yearBNum = parseInt(yearB);
+
             const months = [
                 'January', 'February', 'March', 'April', 'May', 'June', 
                 'July', 'August', 'September', 'October', 'November', 'December'
             ];
-            return months.indexOf(monthName) + 1;
-        };
 
-        // Sort by year (desc), then by month (desc)
-        timesheetData.sort((a, b) => {
-            let [monthA, yearA] = a.id.split(' ');
-            let [monthB, yearB] = b.id.split(' ');
+            const monthNumA = months.indexOf(monthA) + 1;
+            const monthNumB = months.indexOf(monthB) + 1;
 
-            yearA = parseInt(yearA);
-            yearB = parseInt(yearB);
-
-            let monthNumA = monthNameToNumber(monthA);
-            let monthNumB = monthNameToNumber(monthB);
-
-            return yearB - yearA || monthNumB - monthNumA;
+            return yearBNum - yearANum || monthNumB - monthNumA;
         });
 
-        // Convert back to object format
         let sortedTimesheetData = {};
         timesheetData.forEach(entry => {
             sortedTimesheetData[entry.id] = entry.data;
         });
 
-        return res.json({ userId, timesheet: sortedTimesheetData });
+        return res.json({ 
+            userId, 
+            timesheet: sortedTimesheetData,
+            totalSalary: totalSalary.toFixed(2),
+            currency: currency
+        });
     } catch (error) {
         console.error("Error fetching timesheet:", error);
         return res.status(500).json({ message: "Internal Server Error", error });
@@ -156,36 +215,30 @@ timeKeeperRouter.put('/', async (req, res) => {
 
         let timesheetData = monthDoc.data();
 
-        // Update entries
         let updatedEntries = timesheetData.entries.map(entry => {
             let updatedEntry = entries.find(e => e.date === entry.date);
             return updatedEntry ? { ...entry, time: updatedEntry.time } : entry;
         });
 
-        // Calculate total time
         let totalMinutes = updatedEntries.reduce((sum, entry) => {
             let { hours, minutes } = extractTime(entry.time);
             return sum + hours * 60 + minutes;
         }, 0);
 
-        // Calculate expected (standard) work hours
         let requiredMinutes = updatedEntries.reduce((sum, entry) => {
             let dayName = new Date(entry.date).toLocaleDateString("en-US", { weekday: "short" });
             return sum + (STANDARD_WORK_HOURS[dayName] || 0) * 60;
         }, 0);
 
-        // Calculate additional and deficient time
         let additionalMinutes = Math.max(0, totalMinutes - requiredMinutes);
         let deficientMinutes = Math.max(0, requiredMinutes - totalMinutes);
 
-        // Convert to readable format
         let formatTime = (minutes) => `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
 
         let totalTime = formatTime(totalMinutes);
         let additionalTime = formatTime(additionalMinutes);
         let deficientTime = formatTime(deficientMinutes);
 
-        // Update Firestore document
         await monthsCollectionRef.update({
             entries: updatedEntries,
             totalTime,
