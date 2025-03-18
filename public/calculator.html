@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.15.10/sweetalert2.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.3/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
@@ -16,16 +18,16 @@
     <header class="d-flex flex-column flex-md-row justify-content-between align-items-center bg-light border mb-3 shadow p-2 bg-body rounded">
         <h4 class="text-center text-md-start mb-2 mb-md-0">🕒 Monthly Work Time Calculator</h4>
         <div id="userProfile" class="d-flex align-items-center">
-            <img id="userPhoto" src="" alt="User" class="rounded-circle me-2" width="40" height="40" style="display: none;">
+            <img id="userPhoto" src="" alt="User" class="rounded-circle me-2 clickable" width="40" height="40" style="display: none;" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Click to change configuration">
             <span id="userName" class="me-3"></span>
-            <img id="logoutBtn" class="logout-img" src="./logo/logout.png" alt="Logout">
+            <img id="logoutBtn" class="logout-img" src="./logo/logout.png" alt="Logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Logout">
         </div>
     </header>
 
     <div class="border shadow p-2 bg-body rounded">
         <div class="d-flex mb-3 gap-2">
             <input type="month" id="monthPicker" class="form-control w-25">
-            <button id="loadData" class="btn btn-primary">📅 Load Month</button>
+            <button id="loadData" class="btn btn-sm btn-primary">📅 Load Month</button>
         </div>
     
         <div class="table-responsive">
@@ -114,7 +116,7 @@
 </div>
 
 <!-- Scroll-to-top button -->
-<button id="scrollToTopBtn" title="Go to top"><img src="./logo/fireClock.png" alt="Scroll-to-top"></button>
+<button id="scrollToTopBtn" title="Go to top"><img src="./logo/clock.png" alt="Scroll-to-top"></button>
 
 <!-- Modal for user input after login -->
 <div id="userInputModal" class="modal fade" tabindex="-1" aria-labelledby="userInputModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -178,11 +180,11 @@
                         <div class="col-md-6">
                             <label for="currencySelect" class="form-label">Currency</label>
                             <select id="currencySelect" class="form-select">
-                                <option value="BDT (৳‎)">BDT (৳‎)</option>
-                                <option value="INR (₹‎‎)">INR (₹‎)</option>
-                                <option value="USD ($)">USD ($)</option>
-                                <option value="EUR (€‎)">EUR (€‎)</option>
-                                <option value="GBP (£‎)">GBP (£‎)</option>
+                                <option value="BDT (৳‎)">BDT</option>
+                                <option value="INR (₹‎‎)">INR</option>
+                                <option value="USD ($)">US</option>
+                                <option value="EUR (€‎)">EUR</option>
+                                <option value="GBP (£‎)">GBP</option>
                             </select>
                         </div>
                     </div>
@@ -270,11 +272,11 @@
                         <div class="col-md-6">
                             <label for="jobCurrencySelect" class="form-label">Currency</label>
                             <select id="jobCurrencySelect" class="form-select">
-                                <option value="BDT (৳‎)">BDT (৳‎)</option>
-                                <option value="INR (₹‎‎)">INR (₹‎)</option>
-                                <option value="USD ($)">USD ($)</option>
-                                <option value="EUR (€‎)">EUR (€‎)</option>
-                                <option value="GBP (£‎)">GBP (£‎)</option>
+                                <option value="BDT (৳‎)">BDT</option>
+                                <option value="INR (₹‎‎)">INR</option>
+                                <option value="USD ($)">US</option>
+                                <option value="EUR (€‎)">EUR</option>
+                                <option value="GBP (£‎)">GBP</option>
                             </select>
                         </div>
                     </div>
