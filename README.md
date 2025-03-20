@@ -31,7 +31,7 @@
   - Google Authentication for secure access.
 
 - **Enhanced Security**:
-  - **Helmet.js** for setting HTTP security headers.
+  - **Helmet** for setting HTTP security headers.
   - **CORS** to manage cross-origin requests safely.
   - **Express session** to manage sessions.
   - **morgan** for logs.
