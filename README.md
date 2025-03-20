@@ -8,6 +8,12 @@
 
 ---
 
+## Why I Created This
+
+In my office, I get paid on an hourly basis, and they use software to track my start and end times. However, that software doesn’t provide a report where I can see my total monthly hours and how much I will be paid. To solve this problem, I built **TimeCalc**, a tool that allows me to track my work hours, calculate monthly totals, and see an accurate estimate of my earnings. This helps me stay organized and ensures transparency in my work hours and salary calculations.
+
+---
+
 ## Features
 
 - **Customizable Tracking**:
