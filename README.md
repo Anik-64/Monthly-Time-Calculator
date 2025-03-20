@@ -1,7 +1,7 @@
 # Monthly Work Time Calculator (TimeCalc)
 
 <p align="center">
-  <img src="https://firebasestorage.googleapis.com/v0/b/alleventsair.appspot.com/o/files%2Fimages%2FGmhUu_1741541334176.png?alt=media&token=f64aacd4-ca72-4d94-abb2-b7f2a2e52ded" alt="TimeCalc Logo" width="250" height="250">
+  <img src="https://firebasestorage.googleapis.com/v0/b/alleventsair.appspot.com/o/files%2Fimages%2FGmhUu_1741541334176.png?alt=media&token=f64aacd4-ca72-4d94-abb2-b7f2a2e52ded" alt="TimeCalc Logo" width="200" height="250">
 </p>
 
 **TimeCalc** is a web-based tool designed to help users track their work hours or personal goals, calculate monthly summaries, and generate detailed reports. Whether you’re an employee managing job hours with salary insights or a student tracking progress toward a target, TimeCalc provides a flexible and user-friendly solution.
@@ -29,6 +29,12 @@
   - Responsive design with Bootstrap and Tailwind CSS.
   - Interactive elements like tooltips and hover effects for better UX.
   - Google Authentication for secure access.
+
+- **Enhanced Security**:
+  - **Helmet.js** for setting HTTP security headers.
+  - **CORS** to manage cross-origin requests safely.
+  - **Express session** to manage sessions.
+  - **morgan** for logs.
 
 ---
 
