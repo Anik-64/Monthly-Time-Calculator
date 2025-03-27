@@ -4,3 +4,7 @@ node_modules
 Dockerfile
 .dockerignore
 README.md
+sitemap.xml
+setup.bat
+access.log
+.env
