@@ -1,16 +1,18 @@
 FROM node:20 AS builder
-WORKDIR /usr/src/ipcidrcalculator
+WORKDIR /usr/src/markdownapp
 COPY package*.json ./
 RUN npm install
 COPY . .
 
 FROM node:20-alpine
-WORKDIR /usr/src/ipcidrcalculator
-COPY --from=builder /usr/src/ipcidrcalculator/node_modules ./node_modules
-COPY --from=builder /usr/src/ipcidrcalculator/package.json ./
-COPY --from=builder /usr/src/ipcidrcalculator/public ./public
-COPY --from=builder /usr/src/ipcidrcalculator/server ./server
-COPY --from=builder /usr/src/ipcidrcalculator/index.js ./
+WORKDIR /usr/src/markdownapp
+COPY --from=builder /usr/src/markdownapp/node_modules ./node_modules
+COPY --from=builder /usr/src/markdownapp/package.json ./
+COPY --from=builder /usr/src/markdownapp/public ./public
+COPY --from=builder /usr/src/markdownapp/server ./server
+COPY --from=builder /usr/src/markdownapp/auth ./auth
+COPY --from=builder /usr/src/markdownapp/config ./config
+COPY --from=builder /usr/src/markdownapp/index.js ./
 
 EXPOSE 2723
 CMD ["npm", "start"]
