@@ -4,6 +4,7 @@ const session = require("express-session");
 const passport = require("passport");
 const cors = require('cors');
 const helmet = require('helmet');
+const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
 const fs = require("fs");
 const path = require("path");
@@ -24,6 +25,16 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.static("public"));
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: "Too many requests from this IP, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+app.use("/api/", limiter);
 
 app.use(
     helmet({
