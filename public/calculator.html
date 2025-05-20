@@ -107,7 +107,12 @@
     </div>
 
     <div id="savedTimesheets" class="mt-4 border shadow rounded p-2">
-        <h5>📁 Saved Timesheets</h5>
+        <div class="d-flex justify-content-between">
+            <h5>📁 Saved Timesheets</h5>
+            <div class="generatebtn">
+                <!-- Report generate button will be dynamically added here -->
+            </div>
+        </div>
         <div id="timesheetContainer" class="row">
             <!-- Timesheet cards will be dynamically added here -->
         </div>
@@ -189,8 +194,8 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <button id="goBackBtn" class="btn btn-secondary">Go back</button>
-                        <button id="submitJobBtn" class="btn btn-primary">Submit</button>
+                        <button id="goBackBtn" class="btn btn-sm btn-secondary">Go back</button>
+                        <button id="submitJobBtn" class="btn btn-sm btn-primary">Submit</button>
                     </div>
                 </div>
                 <div id="goalForm" class="d-none">
