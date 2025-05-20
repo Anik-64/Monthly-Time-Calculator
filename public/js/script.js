@@ -501,18 +501,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             let timesheetArray = Array.isArray(data.timesheet) ? data.timesheet : Object.entries(data.timesheet).map(([month, details]) => ({
                 month,
                 data: details
-            }));
+            })).filter(item => item.month !== "Invalid Date");
 
             let totalSalary = data.totalSalary; 
             let currency = data.currency;
 
             if (totalSalary != 0) {
                 timesheetContainer.innerHTML = `
-                    <div class="row mb-2 mt-2">
-                        <div class="col-12">
-                            <div class="alert alert-info text-center">
-                                Total Salary Across All Months: <strong>${totalSalary} ${currency}</strong>
-                            </div>
+                    <div class="col-12 mb-2 mt-2">
+                        <div class="alert alert-info text-center">
+                            Total Salary Across All Months: <strong>${totalSalary} ${currency}</strong>
                         </div>
                     </div>
                 `;
@@ -553,12 +551,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (!document.getElementById('generateReportBtn')) {
                     const reportBtn = document.createElement('button');
                     reportBtn.id = 'generateReportBtn';
-                    reportBtn.className = 'btn btn-secondary mt-3 w-100';
+                    reportBtn.className = 'btn btn-sm btn-secondary';
                     reportBtn.textContent = 'Generate Report';
-                    const btnContainer = document.createElement("div");
-                    btnContainer.className = "col-12 text-center";
-                    btnContainer.appendChild(reportBtn);
-                    timesheetContainer.appendChild(btnContainer);
+                    const generatebtn = document.querySelector(".generatebtn");
+                    if (generatebtn) {
+                        generatebtn.appendChild(reportBtn);
+                    }
                 }
 
                 originalTimesheetContent = timesheetContainer.innerHTML;
@@ -620,8 +618,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </table>
             </div>
             <div class="mt-2">
-                <button id="backBtn" class="btn btn-secondary me-2">Back to Timesheets</button>
-                <button id="exportPdfBtn" class="btn btn-primary">Export as PDF</button>
+                <button id="backBtn" class="btn btn-sm btn-secondary me-2">Back to Timesheets</button>
+                <button id="exportPdfBtn" class="btn btn-sm btn-primary">Export as PDF</button>
             </div>
         `;
 
@@ -662,7 +660,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ]),
                     foot: [['Total Salary', '', '', `${totalSalary} ${currency}`, '', '']],
                 });
-                doc.save(`Timesheet_Report_${userId}_${new Date().toISOString().split('T')[0]}.pdf`);
+                const now = new Date();
+                const formattedDateTime = now.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: 'Asia/Dhaka'
+                }).replace(/[,]/g, '').replace(/ /g, '-').toLowerCase();
+                doc.save(`Timesheet_Report_${userName}_${formattedDateTime}.pdf`);
             } else {
                 Swal.fire("Error", "jsPDF library is not loaded correctly. Please ensure the CDN is included and loaded.", "error");
             }
