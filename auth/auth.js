@@ -1,14 +1,22 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const admin = require('../config/config');
+require("dotenv").config();
+
+const isProduction = process.env.NODE_ENV === "prod";
 
 const db = admin.firestore();
 
 passport.use(new GoogleStrategy({
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        // callbackURL: "http://localhost:3000/google/callback",
-        callbackURL: "https://monthly-time-calculator.onrender.com/google/callback",
+        clientID: isProduction 
+            ? process.env.GOOGLE_CLIENT_ID_PROD 
+            : process.env.GOOGLE_CLIENT_ID_DEV,
+        clientSecret: isProduction 
+            ? process.env.GOOGLE_CLIENT_SECRET_PROD 
+            : process.env.GOOGLE_CLIENT_SECRET_DEV,
+        callbackURL: isProduction
+            ? "https://monthly-time-calculator.onrender.com/google/callback"
+            : "http://localhost:3000/google/callback",
         passReqToCallback : true
     },
     async function(request, accessToken, refreshToken, profile, done) {
