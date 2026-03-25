@@ -24,7 +24,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
-app.use(express.static("public"));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -113,7 +115,11 @@ app.get('/healthcheck', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + "/public/login.html");
+    // res.sendFile(__dirname + "/public/login.html");
+    res.render('pages/home', {
+        title: 'Home',
+        layout: false
+    });
 });
 
 app.get('/auth/google',
@@ -128,11 +134,19 @@ app.get('/google/callback',
 );
 
 app.get('/monthly-time-calculator', isAuthenticated, (req, res) => {
-    res.sendFile(__dirname + "/public/calculator.html");
+    // res.sendFile(__dirname + "/public/calculator.html");
+    res.render('pages/calculator', {
+        title: 'Calculator',
+        layout: false
+    });
 });
 
 app.get('/auth/failure', (req, res) => {
-    res.sendFile(__dirname + "/public/404.html");
+    // res.sendFile(__dirname + "/public/404.html");
+    res.render('pages/404', {
+        title: '404',
+        layout: false
+    });
 });
 
 app.get('/logout', (req, res) => {
@@ -166,6 +180,12 @@ app.use("/api/v1/timesheet", isAuthenticated, timeSaveRouter);
 app.use("/api/v1/configuration", isAuthenticated, userConfigurationRouter);
 
 // Start the server
-app.listen(process.env.PORT, () => {
-    console.log(`Server running on port ${process.env.PORT}`);
-});
+// app.listen(process.env.PORT, () => {
+//     console.log(`Server running on port ${process.env.PORT}`);
+// });
+
+if (require.main === module) {
+    app.listen(process.env.PORT || 3000, () => console.log(`Running locally on port ${process.env.PORT || 3000}`));
+}
+
+module.exports = app;
