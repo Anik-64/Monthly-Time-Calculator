@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://monthly-time-calculator.onrender.com/</loc>
-        <lastmod>2025-02-01</lastmod>
+        <loc>https://aanniikk-monthly-timecalc.vercel.app/</loc>
+        <lastmod>2026-03-25</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://monthly-time-calculator.onrender.com/features</loc>
-        <lastmod>2025-03-16</lastmod>
+        <loc>https://aanniikk-monthly-timecalc.vercel.app/features</loc>
+        <lastmod>2026-03-25</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://monthly-time-calculator.onrender.com/how-it-works</loc>
-        <lastmod>2025-03-18</lastmod>
+        <loc>https://aanniikk-monthly-timecalc.vercel.app/how-it-works</loc>
+        <lastmod>2026-03-25</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>

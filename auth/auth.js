@@ -15,7 +15,7 @@ passport.use(new GoogleStrategy({
             ? process.env.GOOGLE_CLIENT_SECRET_PROD 
             : process.env.GOOGLE_CLIENT_SECRET_DEV,
         callbackURL: isProduction
-            ? "https://monthly-time-calculator.onrender.com/google/callback"
+            ? "https://aanniikk-monthly-timecalc.vercel.app/google/callback"
             : "http://localhost:3000/google/callback",
         passReqToCallback : true
     },
