@@ -94,15 +94,17 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Log file
-const logStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+// Log file - skip on Vercel to avoid read-only filesystem errors
 morgan.token('body', (req) => {
     const body = { ...req.body };
     if (body.password) body.password = '*****';
     return JSON.stringify(body);
 });
 
-app.use(morgan(':date[iso] :method :url :status :response-time ms - :body', { stream: logStream }));
+if (!process.env.VERCEL) {
+    const logStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+    app.use(morgan(':date[iso] :method :url :status :response-time ms - :body', { stream: logStream }));
+}
 app.use(morgan('dev'));
 
 // Routers

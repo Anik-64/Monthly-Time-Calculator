@@ -3,7 +3,7 @@ const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const admin = require('../config/config');
 require("dotenv").config();
 
-const isProduction = process.env.NODE_ENV === "prod";
+const isProduction = process.env.NODE_ENV === "production";
 
 const db = admin.firestore();
 
